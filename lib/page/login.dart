@@ -1,3 +1,4 @@
+import 'package:app_pentamed/auth_service.dart';
 import 'package:app_pentamed/page/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool statusPassword = true;
+  bool _isLoading = false;
 
   menampilkanPassword() {
     setState(() {
@@ -56,11 +58,18 @@ class _LoginState extends State<Login> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              final box = GetStorage();
-              box.write('username', usernameController.text);
-
-              Get.to(() => Dashboard());
+            onPressed: () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await AuthService().login(
+                usernameController.text,
+                passwordController.text,
+                context,
+              );
+              setState(() {
+                _isLoading = false;
+              });
             },
             child: Text('Login'),
           ),

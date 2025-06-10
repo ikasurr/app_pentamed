@@ -1,6 +1,5 @@
 import 'package:app_pentamed/page/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -21,6 +20,7 @@ class AuthService {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => Dashboard()),
+          (route) => false,
         );
       }
     } on AuthException catch (e) {

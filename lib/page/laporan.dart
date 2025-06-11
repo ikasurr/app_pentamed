@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LaporanPage extends StatefulWidget {
   @override
@@ -10,6 +11,20 @@ class LaporanPage extends StatefulWidget {
 
 class _LaporanPageState extends State<LaporanPage> {
   DateTimeRange? selectedDateRange;
+  List<Map<String, dynamic>> laporanData = [];
+
+  Future<void> fetchLaporanData() async {
+    final supabase = Supabase.instance.client;
+    final response = await supabase
+        .from('laporan')
+        .select()
+        .gte('tanggal', selectedDateRange?.start.toIso8601String() ?? '2000-01-01')
+        .lte('tanggal', selectedDateRange?.end.toIso8601String() ?? DateTime.now().toIso8601String());
+
+    setState(() {
+      laporanData = List<Map<String, dynamic>>.from(response);
+    });
+  }
 
   Future<void> cetakLaporan() async {
     final pdf = pw.Document();
@@ -19,23 +34,28 @@ class _LaporanPageState extends State<LaporanPage> {
         : '${DateFormat('dd MMM yyyy').format(selectedDateRange!.start)} - '
           '${DateFormat('dd MMM yyyy').format(selectedDateRange!.end)}';
 
+    final data = laporanData.map((laporan) {
+      return [
+        DateFormat('dd-MM-yyyy').format(DateTime.parse(laporan['tanggal'])),
+        laporan['obat'],
+        laporan['jumlah'].toString(),
+        'Rp ${laporan['total']}'
+      ];
+    }).toList();
+
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Laporan Transaksi Apotek',
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              pw.Text('Laporan Transaksi Apotek', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 20),
               pw.Text('Periode: $periode'),
               pw.SizedBox(height: 20),
               pw.Table.fromTextArray(
                 headers: ['Tanggal', 'Obat', 'Jumlah', 'Total'],
-                data: [
-                  ['01-06-2025', 'Paracetamol', '2', 'Rp 10.000'],
-                  ['03-06-2025', 'Amoxicillin', '1', 'Rp 7.500'],
-                ],
+                data: data,
               ),
             ],
           );
@@ -73,12 +93,7 @@ class _LaporanPageState extends State<LaporanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Text(
-                "LAPORAN TRANSAKSI",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
+            Center(child: Text("LAPORAN TRANSAKSI", style: TextStyle(fontWeight: FontWeight.bold))),
             SizedBox(height: 20),
             InkWell(
               onTap: () async {
@@ -91,6 +106,7 @@ class _LaporanPageState extends State<LaporanPage> {
                   setState(() {
                     selectedDateRange = picked;
                   });
+                  await fetchLaporanData(); // ambil data dari Supabase
                 }
               },
               child: Row(
@@ -111,12 +127,20 @@ class _LaporanPageState extends State<LaporanPage> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
               ),
-              child: Center(child: Text("Tabel Laporan")),
+              child: laporanData.isEmpty
+                  ? Center(child: Text("Belum ada data"))
+                  : ListView.builder(
+                      itemCount: laporanData.length,
+                      itemBuilder: (context, index) {
+                        final item = laporanData[index];
+                        return Text('${item['tanggal']} - ${item['obat']} (${item['jumlah']})');
+                      },
+                    ),
             ),
             SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: cetakLaporan,
+                onPressed: laporanData.isEmpty ? null : cetakLaporan,
                 style: ElevatedButton.styleFrom(
                   shape: StadiumBorder(),
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),

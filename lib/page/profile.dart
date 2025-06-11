@@ -1,4 +1,6 @@
+import 'package:app_pentamed/page/edit_profil.dart';
 import 'package:flutter/material.dart';
+import 'package:app_pentamed/page/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Profile extends StatefulWidget {
@@ -89,7 +91,7 @@ class _ProfileState extends State<Profile> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const EditProfilePage(),
+                                builder: (_) => const EditProfil(),
                               ),
                             ).then(
                               (_) => fetchUserData(),
@@ -128,8 +130,11 @@ class _ProfileState extends State<Profile> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     await supabase.auth.signOut();
-                    // Kembali ke login
-                    Navigator.pushReplacementNamed(context, '/login');
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
                   label: const Text(

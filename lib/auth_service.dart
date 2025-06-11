@@ -1,4 +1,4 @@
-import 'package:app_pentamed/page/dashboard.dart';
+import 'package:app_pentamed/halaman_awal.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,7 +19,7 @@ class AuthService {
       if (user != null) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => Dashboard()),
+          MaterialPageRoute(builder: (context) => HalamanAwal(pengguna: email)),
           (route) => false,
         );
       }

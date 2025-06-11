@@ -22,8 +22,8 @@ class _HalamanAwalState extends State<HalamanAwal> {
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),
     Icon(Icons.home, size: 30),
-    Icon(Icons.attach_money, size: 30),
-    Icon(Icons.manage_accounts, size: 30),
+    Icon(Icons.article_outlined, size: 30),
+    Icon(Icons.person, size: 30),
   ];
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_storage/get_storage.dart';
 import 'page/login.dart';
 import 'halaman_awal.dart';
 import 'page/dashboard.dart';

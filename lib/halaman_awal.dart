@@ -10,7 +10,7 @@ class HalamanAwal extends StatefulWidget {
 }
 
 class _HalamanAwalState extends State<HalamanAwal> {
-  int _currentIndex = 2;
+  int _currentIndex = 1;
 
   final List<Widget> _pages = [];
 

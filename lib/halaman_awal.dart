@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HalamanAwal extends StatefulWidget {
   final String pengguna;
@@ -22,6 +23,22 @@ class _HalamanAwalState extends State<HalamanAwal> {
   ];
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      backgroundColor: Colors.amber,
+      appBar: AppBar(title: Text("Hallo, ${widget.pengguna}")),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _currentIndex,
+        items: items,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        backgroundColor: Colors.transparent,
+        color: Colors.white,
+        buttonBackgroundColor: Colors.blueAccent,
+      ),
+    );
   }
 }

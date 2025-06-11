@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const LaporanTransaksiApp());
+  runApp(const Laporan());
 }
 
-class LaporanTransaksiApp extends StatelessWidget {
-  const LaporanTransaksiApp({super.key});
+class Laporan extends StatelessWidget {
+  const Laporan({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Laporan Transaksi',
-      theme: ThemeData(
-        fontFamily: 'Poppins',
-      ),
+      theme: ThemeData(fontFamily: 'Poppins'),
       home: const LaporanTransaksiPage(),
       debugShowCheckedModeBanner: false,
     );
@@ -89,8 +87,10 @@ class LaporanTransaksiPage extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     elevation: 6,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -101,9 +101,7 @@ class LaporanTransaksiPage extends StatelessWidget {
                   },
                   child: const Text(
                     'Cetak',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

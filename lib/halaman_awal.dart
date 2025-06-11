@@ -17,13 +17,7 @@ class HalamanAwal extends StatefulWidget {
 class _HalamanAwalState extends State<HalamanAwal> {
   int _currentIndex = 1;
 
-  final List<Widget> _pages = [
-    Obat(),
-    Laporan(),
-    Dashboard(),
-    Laporan(),
-    Profile(),
-  ];
+  final List<Widget> _pages = [Obat(), Dashboard(), Laporan(), Profile()];
 
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),

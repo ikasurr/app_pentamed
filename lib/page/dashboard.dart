@@ -11,84 +11,114 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xD9D3CF), // Warna abu muda latar belakang
+      backgroundColor: const Color(0xFFF2F2F2),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Align(
                 alignment: Alignment.topRight,
-                child: Text("Logo Apotek", style: TextStyle(fontSize: 16)),
+                child: Text(
+                  "Logo Apotek",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
               ),
-              SizedBox(height: 40),
-              DashboardCard(title: "Jumlah Obat"),
+              SizedBox(height: 30),
+              DashboardCard(
+                title: "Jumlah Obat",
+                value: "120",
+                icon: Icons.medical_services_outlined,
+                color: Colors.teal,
+              ),
               SizedBox(height: 20),
-              DashboardCard(title: "Total Transaksi Hari Ini"),
+              DashboardCard(
+                title: "Total Transaksi Hari Ini",
+                value: "36",
+                icon: Icons.shopping_cart_outlined,
+                color: Colors.indigo,
+              ),
               SizedBox(height: 20),
-              DashboardCard(title: "Pendapatan Hari Ini"),
+              DashboardCard(
+                title: "Pendapatan Hari Ini",
+                value: "Rp 5.400.000",
+                icon: Icons.attach_money,
+                color: Colors.orange,
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(),
     );
   }
 }
 
 class DashboardCard extends StatelessWidget {
   final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
 
-  const DashboardCard({required this.title});
+  const DashboardCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 10,
-            offset: Offset(4, 4),
+            offset: Offset(3, 3),
           ),
         ],
       ),
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomBottomNavBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      elevation: 10,
-      color: Colors.white,
-      shape: CircularNotchedRectangle(),
-      notchMargin: 8,
-      child: Container(
-        height: 60,
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Icon(Icons.add_circle_outline),
-            Icon(Icons.receipt_long_outlined),
-            SizedBox(width: 40), // untuk space tombol tengah
-            Icon(Icons.bar_chart_outlined),
-            Icon(Icons.person_outline),
-          ],
-        ),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: EdgeInsets.all(12),
+            child: Icon(icon, size: 30, color: color),
+          ),
+          SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

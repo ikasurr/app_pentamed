@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HalamanAwal extends StatefulWidget {
-  final String pengguna;
-  const HalamanAwal({super.key, required this.pengguna});
+  const HalamanAwal({super.key});
 
   @override
   State<HalamanAwal> createState() => _HalamanAwalState();
@@ -24,7 +23,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.amber,
-      appBar: AppBar(title: Text("Hallo, ${widget.pengguna}")),
+      appBar: AppBar(title: Text("Hallo, Admin")),
       //body: _pages[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,

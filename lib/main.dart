@@ -6,8 +6,14 @@ import '../../utils/app_routes.dart';
 import '../../utils/constants.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi GetStorage
   await GetStorage.init();
+
+  // Inisialisasi Supabase
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+
   runApp(const MyApp());
 }
 

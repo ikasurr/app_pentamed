@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../service/supabase_service.dart';
 
 class ObatListScreen extends StatefulWidget {
-  const ObatListScreen({super.key});
+  const ObatListScreen({Key? key}) : super(key: key);
 
   @override
   State<ObatListScreen> createState() => _ObatListScreenState();
@@ -125,13 +125,20 @@ class _ObatListScreenState extends State<ObatListScreen> {
                             final result = await Get.toNamed(
                               '/obatform',
                               arguments: item,
+                              id: 1, // ✅ tambahkan id
                             );
                             if (result == true) _fetchObat();
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _showDeleteConfirmation(item['id']),
+                          onPressed: () async {
+                            final result = await Get.toNamed(
+                              '/obatform',
+                              id: 1,
+                            ); // ✅ id ditambahkan
+                            if (result == true) _fetchObat();
+                          },
                         ),
                       ],
                     ),

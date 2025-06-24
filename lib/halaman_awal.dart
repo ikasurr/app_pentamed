@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'screens/obat/obat_screen.dart';
-import 'screens/profile/profile_screen.dart';
+import 'package:app_pentamed/screens/profile/profile_screen.dart';
+import 'package:get/get.dart';
 
 class HalamanAwal extends StatefulWidget {
-  const HalamanAwal({super.key});
+  const HalamanAwal({super.key}); // ← tidak butuh parameter pengguna
 
   @override
   State<HalamanAwal> createState() => _HalamanAwalState();
@@ -12,12 +12,21 @@ class HalamanAwal extends StatefulWidget {
 
 class _HalamanAwalState extends State<HalamanAwal> {
   int _currentIndex = 0;
+  late final String pengguna;
 
-  // Buat widget sekali dan tetap (tidak rebuild)
-  final List<Widget> _pages = const [ObatListScreen(), ProfileScreen()];
+  // Ambil argument dari Get.arguments saat init
+  @override
+  void initState() {
+    super.initState();
+    pengguna = (Get.arguments ?? 'Pengguna').toString();
+  }
+
+  final List<Widget> _pages = [ProfileScreen()];
 
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),
+    Icon(Icons.home, size: 30),
+    Icon(Icons.article_outlined, size: 30),
     Icon(Icons.person, size: 30),
   ];
 
@@ -25,11 +34,8 @@ class _HalamanAwalState extends State<HalamanAwal> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.amber,
-      appBar: AppBar(title: const Text("Hallo, Admin")),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages, // ✅ Tidak akan dibuild ulang
-      ),
+      appBar: AppBar(title: Text("Hallo, $pengguna")),
+      body: _pages[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
         items: items,

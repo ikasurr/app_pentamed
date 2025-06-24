@@ -31,7 +31,6 @@ class _HalamanAwalState extends State<HalamanAwal> {
       backgroundColor: Colors.amber,
       appBar: AppBar(title: Text("Hallo, Admin")),
       body: _pages[_currentIndex],
-      body: _pages[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
         items: items,

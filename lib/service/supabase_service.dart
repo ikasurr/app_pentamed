@@ -28,7 +28,7 @@ class SupabaseService {
     String fileName,
   ) async {
     final bytes = await file.readAsBytes();
-    await supaba.storage
+    await supabase.storage
         .from(bucketName)
         .uploadBinary(
           fileName,

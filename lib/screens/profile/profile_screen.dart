@@ -1,12 +1,14 @@
 // lib/screens/profile/profile_screen.dart
 import 'dart:io';
+import 'package:app_pentamed/service/supabase_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../main.dart';
+
 import '../../models/profile_model.dart';
-import '../../services/supabase_service.dart';
+import '../../service/supabase_service.dart';
 import '../../utils/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

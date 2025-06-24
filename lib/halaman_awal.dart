@@ -11,7 +11,7 @@ class HalamanAwal extends StatefulWidget {
 }
 
 class _HalamanAwalState extends State<HalamanAwal> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   final List<Widget> _pages = [ObatListScreen(), ProfileScreen()];
 

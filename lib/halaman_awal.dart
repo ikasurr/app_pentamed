@@ -1,10 +1,9 @@
 import 'package:app_pentamed/page/dashboard.dart';
-import 'package:app_pentamed/page/login.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:app_pentamed/page/profile.dart';
-import 'package:app_pentamed/page/obat.dart';
 import 'package:app_pentamed/page/laporan.dart';
+import 'package:app_pentamed/page/obat/obat_screen.dart';
 
 class HalamanAwal extends StatefulWidget {
   final String pengguna;
@@ -17,7 +16,7 @@ class HalamanAwal extends StatefulWidget {
 class _HalamanAwalState extends State<HalamanAwal> {
   int _currentIndex = 1;
 
-  final List<Widget> _pages = [Obat(), Dashboard(), Laporan(), Profile()];
+  final List<Widget> _pages = [ObatScreen(), Dashboard(), Laporan(), Profile()];
 
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),

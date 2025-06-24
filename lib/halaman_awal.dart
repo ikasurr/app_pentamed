@@ -12,7 +12,7 @@ class HalamanAwal extends StatefulWidget {
 }
 
 class _HalamanAwalState extends State<HalamanAwal> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   final List<Widget> _pages = [
     ObatListScreen(),
@@ -30,6 +30,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
     return Scaffold(
       backgroundColor: Colors.amber,
       appBar: AppBar(title: Text("Hallo, Admin")),
+      body: _pages[_currentIndex],
       body: _pages[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,

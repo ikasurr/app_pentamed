@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Supabase',
+      title: 'Pentamed',
       theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.routes,

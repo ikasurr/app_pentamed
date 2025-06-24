@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:app_pentamed/screens/profile/profile_screen.dart';
-import 'package:app_pentamed/screens/obat/obat_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/obat/obat_screen.dart';
+import 'screens/profile/profile_screen.dart';
 
 class HalamanAwal extends StatefulWidget {
   const HalamanAwal({super.key});

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/obat/obat_screen.dart';
 import 'screens/profile/profile_screen.dart';
 

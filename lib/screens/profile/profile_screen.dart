@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../main.dart';
-
 import '../../models/profile_model.dart';
 import '../../service/supabase_service.dart';
 import '../../utils/app_routes.dart';

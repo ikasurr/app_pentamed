@@ -13,20 +13,23 @@ class HalamanAwal extends StatefulWidget {
 class _HalamanAwalState extends State<HalamanAwal> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [ObatListScreen(), ProfileScreen()];
+  // Buat widget sekali dan tetap (tidak rebuild)
+  final List<Widget> _pages = const [ObatListScreen(), ProfileScreen()];
 
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),
-    Icon(Icons.home, size: 30),
-    Icon(Icons.article_outlined, size: 30),
     Icon(Icons.person, size: 30),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.amber,
-      appBar: AppBar(title: Text("Hallo, Admin")),
-      body: _pages[_currentIndex],
+      appBar: AppBar(title: const Text("Hallo, Admin")),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages, // ✅ Tidak akan dibuild ulang
+      ),
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
         items: items,

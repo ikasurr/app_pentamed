@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:app_pentamed/screens/profile/profile_screen.dart';
 import 'package:get/get.dart';
+import 'package:app_pentamed/screens/obat/obat_screen.dart';
 
 class HalamanAwal extends StatefulWidget {
   const HalamanAwal({super.key}); // ← tidak butuh parameter pengguna
@@ -21,7 +22,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
     pengguna = (Get.arguments ?? 'Pengguna').toString();
   }
 
-  final List<Widget> _pages = [ProfileScreen()];
+  final List<Widget> _pages = [ProfileScreen(), ObatListScreen()];
 
   final items = <Widget>[
     Icon(Icons.medical_information, size: 30),

@@ -26,8 +26,8 @@ class _HalamanAwalState extends State<HalamanAwal> {
   }
 
   final List<Widget> _pages = [
-    ObatListScreen(),
     TransaksiScreen(),
+    ObatListScreen(),
     HomeScreen(),
     Laporan(),
     ProfileScreen(),
@@ -37,7 +37,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
     Icon(Icons.credit_card, size: 30),
     Icon(Icons.medical_information, size: 30),
     Icon(Icons.home, size: 30),
-    Icon(Icons.article_outlined, size: 30),
+    Icon(Icons.assignment, size: 30),
     Icon(Icons.person, size: 30),
   ];
 

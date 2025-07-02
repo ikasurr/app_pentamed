@@ -4,6 +4,8 @@ import 'package:app_pentamed/screens/profile/profile_screen.dart';
 import 'package:get/get.dart';
 import 'package:app_pentamed/screens/obat/obat_screen.dart';
 import 'package:app_pentamed/screens/laporan/laporan_screen.dart';
+import 'package:app_pentamed/screens/transaksi/transaksi_screen.dart';
+import 'package:app_pentamed/screens/home/home_screen.dart';
 
 class HalamanAwal extends StatefulWidget {
   const HalamanAwal({super.key}); // ← tidak butuh parameter pengguna
@@ -23,9 +25,16 @@ class _HalamanAwalState extends State<HalamanAwal> {
     pengguna = (Get.arguments ?? 'Pengguna').toString();
   }
 
-  final List<Widget> _pages = [ProfileScreen(), ObatListScreen(), Laporan()];
+  final List<Widget> _pages = [
+    ObatListScreen(),
+    TransaksiScreen(),
+    HomeScreen(),
+    Laporan(),
+    ProfileScreen(),
+  ];
 
   final items = <Widget>[
+    Icon(Icons.credit_card, size: 30),
     Icon(Icons.medical_information, size: 30),
     Icon(Icons.home, size: 30),
     Icon(Icons.article_outlined, size: 30),

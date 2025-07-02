@@ -15,7 +15,7 @@ class HalamanAwal extends StatefulWidget {
 }
 
 class _HalamanAwalState extends State<HalamanAwal> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   late final String pengguna;
 
   // Ambil argument dari Get.arguments saat init

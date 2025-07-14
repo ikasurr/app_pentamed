@@ -29,7 +29,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
     TransaksiScreen(),
     ObatListScreen(),
     HomeScreen(),
-    Laporan(),
+    LaporanScreen(),
     ProfileScreen(),
   ];
 

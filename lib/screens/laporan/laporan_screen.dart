@@ -5,14 +5,14 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-class LaporanTransaksiPage extends StatefulWidget {
-  const LaporanTransaksiPage({super.key});
+class LaporanScreen extends StatefulWidget {
+  const LaporanScreen({super.key});
 
   @override
-  State<LaporanTransaksiPage> createState() => _LaporanTransaksiPageState();
+  State<LaporanScreen> createState() => _LaporanScreenState();
 }
 
-class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
+class _LaporanScreenState extends State<LaporanScreen> {
   DateTime? tanggalMulai;
   DateTime? tanggalAkhir;
   String keyword = '';
@@ -70,9 +70,10 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
         build: (pw.Context context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('LAPORAN TRANSAKSI',
-                style: pw.TextStyle(
-                    fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              'LAPORAN TRANSAKSI',
+              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+            ),
             pw.SizedBox(height: 10),
             pw.Text(
               'Periode: ${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}',
@@ -87,7 +88,7 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
                     laporanData[i]['tanggal'],
                     laporanData[i]['keterangan'],
                     'Rp ${laporanData[i]['jumlah']}',
-                  ]
+                  ],
               ],
             ),
             pw.SizedBox(height: 10),
@@ -101,7 +102,8 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
     );
 
     await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save());
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
   }
 
   @override
@@ -173,35 +175,36 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
                   child: loading
                       ? const Center(child: CircularProgressIndicator())
                       : laporanData.isEmpty
-                          ? const Center(child: Text('Tidak ada data.'))
-                          : Column(
-                              children: [
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: laporanData.length,
-                                    itemBuilder: (context, index) {
-                                      final item = laporanData[index];
-                                      return ListTile(
-                                        title: Text(item['keterangan']),
-                                        subtitle: Text(
-                                            'Tanggal: ${item['tanggal']} | Jumlah: Rp ${item['jumlah']}'),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                const Divider(thickness: 1),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    'Total: Rp ${_totalTransaksi()}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                      ? const Center(child: Text('Tidak ada data.'))
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: laporanData.length,
+                                itemBuilder: (context, index) {
+                                  final item = laporanData[index];
+                                  return ListTile(
+                                    title: Text(item['keterangan']),
+                                    subtitle: Text(
+                                      'Tanggal: ${item['tanggal']} | Jumlah: Rp ${item['jumlah']}',
                                     ),
-                                  ),
-                                ),
-                              ],
+                                  );
+                                },
+                              ),
                             ),
+                            const Divider(thickness: 1),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'Total: Rp ${_totalTransaksi()}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -212,7 +215,9 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
                   foregroundColor: Colors.black,
                   elevation: 6,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 30, vertical: 12),
+                    horizontal: 30,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),

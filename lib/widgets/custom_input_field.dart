@@ -7,6 +7,8 @@ class CustomInputField extends StatelessWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final int? maxLines;
+  final Widget? suffixIcon;
+  final Color? borderColor;
 
   const CustomInputField({
     super.key,
@@ -16,6 +18,8 @@ class CustomInputField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.maxLines = 1,
+    this.suffixIcon,
+    this.borderColor,
   });
 
   @override
@@ -25,12 +29,17 @@ class CustomInputField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: labelText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-        filled: true,
-        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: borderColor ?? Colors.grey),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        suffixIcon: suffixIcon,
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: borderColor ?? Colors.teal),
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }

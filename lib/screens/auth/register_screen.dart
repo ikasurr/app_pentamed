@@ -83,64 +83,146 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Daftar')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
+      backgroundColor: const Color(0xFFE0F7F1), // mint green soft
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.person_add, size: 80, color: Colors.teal),
-                const SizedBox(height: 20),
-                CustomInputField(
-                  controller: _usernameController,
-                  labelText: 'Username',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Masukkan username';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                CustomInputField(
-                  controller: _emailController,
-                  labelText: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || !GetUtils.isEmail(value)) {
-                      return 'Masukkan email yang valid';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                CustomInputField(
-                  controller: _passwordController,
-                  labelText: 'Password',
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.length < 6) {
-                      return 'Password minimal 6 karakter';
-                    }
-                    return null;
-                  },
-                ),
                 const SizedBox(height: 24),
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _signUp,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text('Daftar'),
-                        ),
+
+                // Card form
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 32,
+                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
                       ),
+                    ],
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Sign up',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Username
+                        CustomInputField(
+                          controller: _usernameController,
+                          labelText: 'Username',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Masukkan username';
+                            }
+                            return null;
+                          },
+                          borderColor: Colors.teal,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Email
+                        CustomInputField(
+                          controller: _emailController,
+                          labelText: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || !GetUtils.isEmail(value)) {
+                              return 'Masukkan email yang valid';
+                            }
+                            return null;
+                          },
+                          borderColor: Colors.teal,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Password
+                        CustomInputField(
+                          controller: _passwordController,
+                          labelText: 'Password',
+                          obscureText: true,
+                          suffixIcon: const Icon(Icons.visibility_outlined),
+                          validator: (value) {
+                            if (value == null || value.length < 6) {
+                              return 'Password minimal 6 karakter';
+                            }
+                            return null;
+                          },
+                          borderColor: Colors.teal,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Tombol daftar
+                        _isLoading
+                            ? const CircularProgressIndicator()
+                            : SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: _signUp,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF80CBC4),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Sign up',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                        const SizedBox(height: 20),
+
+                        // Login link
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account? "),
+                            GestureDetector(
+                              onTap: () => Get.back(),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.lightBlue,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+                const Text(
+                  '© Copyright Kelompok 5',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
               ],
             ),
           ),

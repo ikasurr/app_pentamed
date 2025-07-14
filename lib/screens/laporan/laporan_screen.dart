@@ -5,26 +5,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(const Laporan());
-}
-
-class Laporan extends StatelessWidget {
-  const Laporan({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Laporan Transaksi',
-      theme: ThemeData(fontFamily: 'Poppins'),
-      home: const LaporanTransaksiPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class LaporanTransaksiPage extends StatefulWidget {
   const LaporanTransaksiPage({super.key});
 
@@ -33,40 +13,52 @@ class LaporanTransaksiPage extends StatefulWidget {
 }
 
 class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
-  DateTime? selectedDate;
+  DateTime? tanggalMulai;
+  DateTime? tanggalAkhir;
+  String keyword = '';
   List<dynamic> laporanData = [];
   bool loading = false;
 
   final supabase = Supabase.instance.client;
 
-  Future<void> pilihTanggal() async {
-    final picked = await showDatePicker(
+  Future<void> pilihTanggalRange() async {
+    final picked = await showDateRangePicker(
       context: context,
-      initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
 
     if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        tanggalMulai = picked.start;
+        tanggalAkhir = picked.end;
       });
       ambilDataLaporan();
     }
   }
 
   Future<void> ambilDataLaporan() async {
+    if (tanggalMulai == null || tanggalAkhir == null) return;
+
     setState(() => loading = true);
-    final tanggalFormatted = DateFormat('yyyy-MM-dd').format(selectedDate!);
+
     final res = await supabase
         .from('laporan')
         .select()
-        .eq('tanggal', tanggalFormatted)
-        .order('id');
+        .gte('tanggal', DateFormat('yyyy-MM-dd').format(tanggalMulai!))
+        .lte('tanggal', DateFormat('yyyy-MM-dd').format(tanggalAkhir!))
+        .ilike('keterangan', '%$keyword%')
+        .order('tanggal');
 
     setState(() {
       laporanData = res;
       loading = false;
+    });
+  }
+
+  int _totalTransaksi() {
+    return laporanData.fold<int>(0, (total, item) {
+      return total + (item['jumlah'] as int);
     });
   }
 
@@ -81,19 +73,27 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
             pw.Text('LAPORAN TRANSAKSI',
                 style: pw.TextStyle(
                     fontSize: 24, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 20),
-            pw.Text('Periode: ${DateFormat('dd MMMM yyyy').format(selectedDate!)}'),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'Periode: ${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}',
+            ),
             pw.SizedBox(height: 20),
             pw.Table.fromTextArray(
-              headers: ['No', 'Keterangan', 'Jumlah'],
+              headers: ['No', 'Tanggal', 'Keterangan', 'Jumlah'],
               data: [
                 for (int i = 0; i < laporanData.length; i++)
                   [
                     '${i + 1}',
+                    laporanData[i]['tanggal'],
                     laporanData[i]['keterangan'],
-                    'Rp ${laporanData[i]['jumlah']}'
+                    'Rp ${laporanData[i]['jumlah']}',
                   ]
               ],
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'Total: Rp ${_totalTransaksi()}',
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
             ),
           ],
         ),
@@ -106,34 +106,30 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tanggalText = selectedDate == null
-        ? 'Pilih Tanggal'
-        : DateFormat('dd MMMM yyyy').format(selectedDate!);
+    final periodeText = (tanggalMulai == null || tanggalAkhir == null)
+        ? 'Pilih Rentang Tanggal'
+        : '${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}';
 
     return Scaffold(
       backgroundColor: const Color(0xFFE9E6E6),
+      appBar: AppBar(
+        title: const Text('Laporan Transaksi'),
+        backgroundColor: const Color(0xFFE9E6E6),
+        elevation: 0,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const Text(
-                'LAPORAN TRANSAKSI',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 24),
               GestureDetector(
-                onTap: pilihTanggal,
+                onTap: pilihTanggalRange,
                 child: Row(
                   children: [
                     const Icon(Icons.calendar_today, size: 28),
                     const SizedBox(width: 12),
                     Text(
-                      'Periode: $tanggalText',
+                      periodeText,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -142,10 +138,26 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Cari keterangan atau nama...',
+                  filled: true,
+                  fillColor: Colors.white,
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: (value) {
+                  keyword = value;
+                  ambilDataLaporan();
+                },
+              ),
+              const SizedBox(height: 16),
               Expanded(
                 child: Container(
-                  width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -162,34 +174,52 @@ class _LaporanTransaksiPageState extends State<LaporanTransaksiPage> {
                       ? const Center(child: CircularProgressIndicator())
                       : laporanData.isEmpty
                           ? const Center(child: Text('Tidak ada data.'))
-                          : ListView.builder(
-                              itemCount: laporanData.length,
-                              itemBuilder: (context, index) {
-                                final item = laporanData[index];
-                                return ListTile(
-                                  title: Text(item['keterangan']),
-                                  subtitle: Text('Jumlah: Rp ${item['jumlah']}'),
-                                );
-                              },
+                          : Column(
+                              children: [
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: laporanData.length,
+                                    itemBuilder: (context, index) {
+                                      final item = laporanData[index];
+                                      return ListTile(
+                                        title: Text(item['keterangan']),
+                                        subtitle: Text(
+                                            'Tanggal: ${item['tanggal']} | Jumlah: Rp ${item['jumlah']}'),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const Divider(thickness: 1),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    'Total: Rp ${_totalTransaksi()}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: laporanData.isEmpty ? null : cetakPDF,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                   elevation: 6,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 30, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   shadowColor: Colors.black38,
                 ),
                 child: const Text(
-                  'Cetak',
+                  'Cetak PDF',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

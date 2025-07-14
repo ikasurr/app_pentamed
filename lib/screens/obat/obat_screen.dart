@@ -76,82 +76,145 @@ class _ObatListScreenState extends State<ObatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kelola Obat')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _obatList.isEmpty
-          ? const Center(child: Text('Belum ada data obat'))
-          : ListView.builder(
-              itemCount: _obatList.length,
-              itemBuilder: (context, index) {
-                final item = _obatList[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+      backgroundColor: const Color(0xFFE0F7F1), // Warna mint background
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Search bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.search),
+                    hintText: 'Cari',
+                    border: InputBorder.none,
                   ),
-                  child: ListTile(
-                    leading:
-                        item['img'] != null && item['img'].toString().isNotEmpty
-                        ? Image.network(
-                            item['img'],
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.medication, size: 40),
-                    title: Text(
-                      item['nama'] ?? '-',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Tombol tambah obat
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final result = await Get.toNamed('/obatform');
+                    if (result == true) _fetchObat();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shadowColor: Colors.grey.withOpacity(0.6),
+                    elevation: 6,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Harga: Rp${item['harga']}"),
-                        Text(
-                          "Stok: ${item['stok']}",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        Text(item['deskripsi'] ?? ''),
-                      ],
-                    ),
-                    isThreeLine: true,
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () async {
-                            final result = await Get.toNamed(
-                              '/obatform',
-                              arguments: item,
-                              id: 1, // ✅ tambahkan id
-                            );
-                            if (result == true) _fetchObat();
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            final result = await Get.toNamed(
-                              '/obatform',
-                              id: 1,
-                            ); // ✅ id ditambahkan
-                            if (result == true) _fetchObat();
-                          },
-                        ),
-                      ],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Get.toNamed('/obatform');
-          if (result == true) _fetchObat();
-        },
-        child: const Icon(Icons.add),
+                  child: const Text(
+                    'Tambah Obat',
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Grid Obat
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _obatList.isEmpty
+                    ? const Center(child: Text('Belum ada data obat'))
+                    : GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 3 / 4,
+                            ),
+                        itemCount: _obatList.length,
+                        itemBuilder: (context, index) {
+                          final item = _obatList[index];
+                          return GestureDetector(
+                            onTap: () {}, // Aksi opsional
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    spreadRadius: 1,
+                                    offset: Offset(4, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  item['img'] != null &&
+                                          item['img'].toString().isNotEmpty
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          child: Image.network(
+                                            item['img'],
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.medication,
+                                          size: 60,
+                                          color: Colors.grey,
+                                        ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    item['nama'] ?? '-',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Rp${item['harga']}",
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

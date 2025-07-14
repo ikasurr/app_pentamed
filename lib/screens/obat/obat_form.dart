@@ -81,7 +81,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
       }
 
       await _supabaseService.upsertObat(data);
-      Get.back(result: true, id: 1); // ✅ id ditambahkan
+      Get.back(result: true); // ✅ id ditambahkan
       Get.snackbar(
         'Sukses',
         'Data obat berhasil disimpan',

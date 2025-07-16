@@ -114,10 +114,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                     ),
                     child: const Text(
                       'Tambah Obat',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),
@@ -231,7 +228,6 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                       item['nama'] ?? '-',
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
-                                        fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
                                       ),

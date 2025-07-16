@@ -189,11 +189,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an account? "),
+                            const Text("Belum punya akun? "),
                             GestureDetector(
                               onTap: () => Get.toNamed(AppRoutes.register),
                               child: const Text(
-                                'Sign up',
+                                'Daftar',
                                 style: TextStyle(
                                   color: Colors.lightBlue,
                                   fontWeight: FontWeight.w600,

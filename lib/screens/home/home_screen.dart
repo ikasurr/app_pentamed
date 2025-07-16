@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,30 +29,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final user = supabase.auth.currentUser;
-
       if (user == null) {
-        setState(() {
-          loading = false;
-        });
+        setState(() => loading = false);
         return;
       }
 
       final userId = user.id;
 
-      // Jumlah total obat
+      // Obat
       final obatRes = await supabase.from('obat').select('id');
       totalObat = obatRes.length;
 
-      // Hari ini (format ISO)
-      final hariIni = DateTime.now();
-      final mulai = DateTime(
-        hariIni.year,
-        hariIni.month,
-        hariIni.day,
-      ).toIso8601String();
-      final akhir = hariIni.toIso8601String();
+      // Hari ini
+      final now = DateTime.now();
+      final mulai = DateTime(now.year, now.month, now.day).toIso8601String();
+      final akhir = now.toIso8601String();
 
-      // Transaksi hari ini
       final transaksiRes = await supabase
           .from('transaksi')
           .select('total')
@@ -65,23 +58,23 @@ class _HomeScreenState extends State<HomeScreen> {
         (sum, item) => sum + (item['total'] as int),
       );
     } catch (e) {
-      print('Error ambil data dashboard: $e');
+      print('Error dashboard: $e');
     }
 
     setState(() => loading = false);
   }
 
-  Widget buildCard(String title, String value, IconData icon, Color color) {
+  Widget buildCard(String title, String value, IconData icon) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: color,
+          color: Colors.white.withOpacity(0.1), // semi-transparan
           borderRadius: BorderRadius.circular(20),
           boxShadow: const [
             BoxShadow(
-              color: Colors.black26,
+              color: Colors.black12,
               blurRadius: 6,
               offset: Offset(2, 4),
             ),
@@ -94,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             Text(
               value,
-              style: const TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 24,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -104,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
             ),
           ],
         ),
@@ -115,11 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFE0F7F1),
       appBar: AppBar(
-        title: const Text('Dashboard'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Dashboard',
+          style: GoogleFonts.poppins(color: Colors.black),
+        ),
+        backgroundColor: const Color(0xFFE0F7F1),
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -132,13 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Total Obat',
                       '$totalObat',
                       Icons.medication_outlined,
-                      Colors.teal,
                     ),
                     buildCard(
                       'Transaksi Hari Ini',
                       '$totalTransaksiHariIni',
                       Icons.receipt_long,
-                      Colors.orange,
                     ),
                   ],
                 ),
@@ -148,7 +143,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Pendapatan Hari Ini',
                       'Rp $totalPendapatanHariIni',
                       Icons.attach_money,
-                      Colors.green,
                     ),
                   ],
                 ),

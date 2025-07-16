@@ -80,7 +80,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
         'Sukses',
         'Data obat berhasil disimpan',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.black.withOpacity(0.5), // transparan
+        backgroundColor: Colors.black.withOpacity(0.5),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
@@ -109,7 +109,13 @@ class _FormObatScreenState extends State<FormObatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(obat != null ? 'Edit Obat' : 'Tambah Obat')),
+      backgroundColor: const Color(0xFFE0F7F1), // ✅ background diubah di sini
+      appBar: AppBar(
+        title: Text(obat != null ? 'Edit Obat' : 'Tambah Obat'),
+        backgroundColor: const Color(0xFFE0F7F1),
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -136,25 +142,38 @@ class _FormObatScreenState extends State<FormObatScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _namaController,
-                      decoration: const InputDecoration(labelText: 'Nama Obat'),
+                      decoration: const InputDecoration(
+                        labelText: 'Nama Obat',
+                        border: OutlineInputBorder(),
+                      ),
                       validator: (value) =>
                           value!.isEmpty ? 'Nama tidak boleh kosong' : null,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _hargaController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Harga'),
+                      decoration: const InputDecoration(
+                        labelText: 'Harga',
+                        border: OutlineInputBorder(),
+                      ),
                       validator: (value) =>
                           value!.isEmpty ? 'Harga tidak boleh kosong' : null,
                     ),
-                    const SizedBox(height: 10),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.save),
                         label: Text(obat != null ? 'Update' : 'Simpan'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         onPressed: _submit,
                       ),
                     ),

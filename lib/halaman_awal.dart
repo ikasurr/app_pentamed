@@ -23,16 +23,16 @@ class _HalamanAwalState extends State<HalamanAwal> {
   }
 
   final List<Widget> _pages = [
-    TransaksiScreen(),
     ObatListScreen(),
+    TransaksiScreen(),
     HomeScreen(),
     LaporanScreen(),
     ProfileScreen(),
   ];
 
   final items = <Widget>[
-    Icon(Icons.credit_card, size: 30),
     Icon(Icons.medical_information, size: 30),
+    Icon(Icons.credit_card, size: 30),
     Icon(Icons.home, size: 30),
     Icon(Icons.assignment, size: 30),
     Icon(Icons.person, size: 30),
@@ -40,7 +40,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber,
+      backgroundColor: const Color(0xFFE0F7F1),
       body: _pages[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
@@ -52,7 +52,7 @@ class _HalamanAwalState extends State<HalamanAwal> {
         },
         backgroundColor: Colors.transparent,
         color: Colors.white,
-        buttonBackgroundColor: Colors.blueAccent,
+        buttonBackgroundColor: const Color(0xFFE0F7F1),
       ),
     );
   }

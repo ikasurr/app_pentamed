@@ -15,7 +15,6 @@ class LaporanScreen extends StatefulWidget {
 class _LaporanScreenState extends State<LaporanScreen> {
   DateTime? tanggalMulai;
   DateTime? tanggalAkhir;
-  String keyword = '';
   List<dynamic> laporanData = [];
   bool loading = false;
 
@@ -42,23 +41,33 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
     setState(() => loading = true);
 
-    final res = await supabase
-        .from('laporan')
-        .select()
-        .gte('tanggal', DateFormat('yyyy-MM-dd').format(tanggalMulai!))
-        .lte('tanggal', DateFormat('yyyy-MM-dd').format(tanggalAkhir!))
-        .ilike('keterangan', '%$keyword%')
-        .order('tanggal');
+    try {
+      final userId = supabase.auth.currentUser!.id;
 
-    setState(() {
-      laporanData = res;
-      loading = false;
-    });
+      final res = await supabase
+          .from('transaksi')
+          .select(
+            'id, tanggal, total, transaksi_detail(obat_id, jumlah_beli, obat(nama))',
+          )
+          .eq('user_id', userId)
+          .gte('tanggal', tanggalMulai!.toIso8601String())
+          .lte('tanggal', tanggalAkhir!.toIso8601String())
+          .order('tanggal');
+
+      setState(() {
+        laporanData = res;
+      });
+    } catch (e) {
+      print("Gagal ambil laporan detail: $e");
+      laporanData = [];
+    }
+
+    setState(() => loading = false);
   }
 
   int _totalTransaksi() {
     return laporanData.fold<int>(0, (total, item) {
-      return total + (item['jumlah'] as int);
+      return total + (item['total'] as int);
     });
   }
 
@@ -67,43 +76,123 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
     pdf.addPage(
       pw.Page(
-        build: (pw.Context context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'LAPORAN TRANSAKSI',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Text(
-              'Periode: ${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}',
-            ),
-            pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
-              headers: ['No', 'Tanggal', 'Keterangan', 'Jumlah'],
-              data: [
-                for (int i = 0; i < laporanData.length; i++)
-                  [
-                    '${i + 1}',
-                    laporanData[i]['tanggal'],
-                    laporanData[i]['keterangan'],
-                    'Rp ${laporanData[i]['jumlah']}',
-                  ],
-              ],
-            ),
-            pw.SizedBox(height: 10),
-            pw.Text(
-              'Total: Rp ${_totalTransaksi()}',
-              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
-            ),
-          ],
+        pageTheme: pw.PageTheme(
+          margin: const pw.EdgeInsets.all(24),
+          pageFormat: PdfPageFormat.a4,
+          buildBackground: (context) => pw.Container(color: PdfColors.white),
         ),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'LAPORAN TRANSAKSI',
+                style: pw.TextStyle(
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 10),
+              pw.Text(
+                'Periode: ${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}',
+              ),
+              pw.SizedBox(height: 20),
+
+              pw.Table(
+                border: pw.TableBorder.all(
+                  color: PdfColors.grey400,
+                  width: 0.5,
+                ),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(2),
+                  1: const pw.FlexColumnWidth(5),
+                  2: const pw.FlexColumnWidth(2),
+                },
+                children: [
+                  // Header
+                  pw.TableRow(
+                    decoration: const pw.BoxDecoration(
+                      color: PdfColors.grey300,
+                    ),
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'Tanggal',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'Obat yang Dibeli',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'Total',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Data rows
+                  ...laporanData.map((item) {
+                    final tanggal = DateFormat(
+                      'dd-MM-yyyy',
+                    ).format(DateTime.parse(item['tanggal']));
+                    final total = item['total'];
+
+                    final obatList = (item['transaksi_detail'] as List)
+                        .map(
+                          (d) => '- ${d['obat']['nama']} (${d['jumlah_beli']})',
+                        )
+                        .join('\n');
+
+                    return pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text(tanggal),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text(obatList),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text('Rp $total'),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
+
+              pw.SizedBox(height: 16),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                  'Total Pendapatan: Rp ${_totalTransaksi()}',
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
+    final pdfBytes = await pdf.save();
+
+    // Langsung download file PDF
+    await Printing.sharePdf(bytes: pdfBytes, filename: 'laporan_transaksi.pdf');
   }
 
   @override
@@ -113,10 +202,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
         : '${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE9E6E6),
+      backgroundColor: const Color(0xFFE0F7F1),
       appBar: AppBar(
         title: const Text('Laporan Transaksi'),
-        backgroundColor: const Color(0xFFE9E6E6),
+        backgroundColor: const Color(0xFFE0F7F1),
         elevation: 0,
       ),
       body: SafeArea(
@@ -140,23 +229,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Cari keterangan atau nama...',
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onChanged: (value) {
-                  keyword = value;
-                  ambilDataLaporan();
-                },
-              ),
               const SizedBox(height: 16),
               Expanded(
                 child: Container(
@@ -179,24 +251,44 @@ class _LaporanScreenState extends State<LaporanScreen> {
                       : Column(
                           children: [
                             Expanded(
-                              child: ListView.builder(
-                                itemCount: laporanData.length,
-                                itemBuilder: (context, index) {
-                                  final item = laporanData[index];
-                                  return ListTile(
-                                    title: Text(item['keterangan']),
-                                    subtitle: Text(
-                                      'Tanggal: ${item['tanggal']} | Jumlah: Rp ${item['jumlah']}',
-                                    ),
-                                  );
-                                },
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('Tanggal')),
+                                    DataColumn(label: Text('Obat yang Dibeli')),
+                                    DataColumn(label: Text('Total Belanja')),
+                                  ],
+                                  rows: laporanData.map((item) {
+                                    final tanggal = DateFormat(
+                                      'dd-MM-yyyy',
+                                    ).format(DateTime.parse(item['tanggal']));
+                                    final obatList =
+                                        (item['transaksi_detail'] as List)
+                                            .map(
+                                              (d) =>
+                                                  '- ${d['obat']['nama']} (${d['jumlah_beli']})',
+                                            )
+                                            .join('\n');
+
+                                    return DataRow(
+                                      cells: [
+                                        DataCell(Text(tanggal)),
+                                        DataCell(
+                                          Text(obatList, softWrap: true),
+                                        ),
+                                        DataCell(Text('Rp ${item['total']}')),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                             ),
                             const Divider(thickness: 1),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                'Total: Rp ${_totalTransaksi()}',
+                                'Total Pendapatan: Rp ${_totalTransaksi()}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -208,24 +300,27 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: laporanData.isEmpty ? null : cetakPDF,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  elevation: 6,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 12,
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: laporanData.isEmpty ? null : cetakPDF,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    elevation: 6,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    shadowColor: Colors.black38,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                  child: const Text(
+                    'Cetak',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  shadowColor: Colors.black38,
-                ),
-                child: const Text(
-                  'Cetak PDF',
-                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],

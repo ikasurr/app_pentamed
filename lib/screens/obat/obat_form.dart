@@ -18,8 +18,6 @@ class _FormObatScreenState extends State<FormObatScreen> {
 
   final _namaController = TextEditingController();
   final _hargaController = TextEditingController();
-  final _stokController = TextEditingController();
-  final _deskripsiController = TextEditingController();
 
   XFile? _image;
   String? oldImageUrl;
@@ -33,8 +31,6 @@ class _FormObatScreenState extends State<FormObatScreen> {
     if (obat != null) {
       _namaController.text = obat!.nama;
       _hargaController.text = obat!.harga.toString();
-      _stokController.text = obat!.stok.toString();
-      _deskripsiController.text = obat!.deskripsi.toString();
       oldImageUrl = obat!.img;
     }
   }
@@ -70,8 +66,6 @@ class _FormObatScreenState extends State<FormObatScreen> {
       final data = {
         'nama': _namaController.text,
         'harga': int.parse(_hargaController.text),
-        'stok': int.parse(_stokController.text),
-        'deskripsi': _deskripsiController.text,
         'img': imageUrl,
         'user_id': userId,
       };
@@ -85,8 +79,13 @@ class _FormObatScreenState extends State<FormObatScreen> {
       Get.snackbar(
         'Sukses',
         'Data obat berhasil disimpan',
-        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.black.withOpacity(0.5), // transparan
         colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+        isDismissible: true,
       );
     } catch (e) {
       Get.snackbar(
@@ -104,8 +103,6 @@ class _FormObatScreenState extends State<FormObatScreen> {
   void dispose() {
     _namaController.dispose();
     _hargaController.dispose();
-    _stokController.dispose();
-    _deskripsiController.dispose();
     super.dispose();
   }
 
@@ -152,19 +149,6 @@ class _FormObatScreenState extends State<FormObatScreen> {
                           value!.isEmpty ? 'Harga tidak boleh kosong' : null,
                     ),
                     const SizedBox(height: 10),
-                    TextFormField(
-                      controller: _stokController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Stok'),
-                      validator: (value) =>
-                          value!.isEmpty ? 'Stok tidak boleh kosong' : null,
-                    ),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      controller: _deskripsiController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(labelText: 'Deskripsi'),
-                    ),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,

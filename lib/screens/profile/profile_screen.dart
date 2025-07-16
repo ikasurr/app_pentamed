@@ -125,9 +125,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _loadProfile();
       Get.snackbar(
         'Sukses',
-        'Avatar berhasil diupload',
-        backgroundColor: Colors.green,
+        'Foto berhasil diubah',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.black.withOpacity(0.5), // transparan
         colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+        isDismissible: true,
       );
     } catch (e) {
       Get.snackbar(
@@ -169,8 +174,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Get.snackbar(
         'Sukses',
         'Password berhasil diubah',
-        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.black.withOpacity(0.5), // transparan
         colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+        isDismissible: true,
       );
       _passwordController.clear();
       _confirmPasswordController.clear();
@@ -200,11 +210,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE0F7F1), // <- Ganti background
       appBar: AppBar(
-        title: const Text('Profil Saya'),
-        actions: [
-          IconButton(onPressed: _signOut, icon: const Icon(Icons.logout)),
-        ],
+        title: const Text('Profil'),
+        backgroundColor: Color(0xFFE0F7F1),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -230,23 +239,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton.icon(
                     onPressed: _uploadAvatar,
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('Ganti Avatar'),
+                    label: const Text('Ganti Foto'),
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Username',
-                      border: OutlineInputBorder(),
+                      border: const UnderlineInputBorder(),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal, width: 2),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _updateProfile,
-                    icon: const Icon(Icons.save),
                     label: const Text('Simpan Profil'),
                   ),
-                  const Divider(height: 40),
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 24),
+                    height: 1,
+                    width: 300, //
+                    color: Colors.grey.shade400,
+                  ),
+
                   const Text(
                     'Ubah Password',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -257,7 +277,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: 'Password Baru',
-                      border: OutlineInputBorder(),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal, width: 2),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -266,18 +292,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: 'Konfirmasi Password',
-                      border: OutlineInputBorder(),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal, width: 2),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _changePassword,
-                    icon: const Icon(Icons.lock_reset),
                     label: const Text('Ubah Password'),
                   ),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
+
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton.icon(
+            onPressed: _signOut,
+            icon: const Icon(Icons.logout),
+            label: const Text('Log Out'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

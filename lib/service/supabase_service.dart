@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../main.dart'; // Untuk akses `supabase` client
+import '../../main.dart'; // Untuk akses supabase client jika diperlukan
 
 class SupabaseService {
   final _client = Supabase.instance.client;
 
   // Getter user ID
   String get currentUserId {
-    final user = _client.auth.currentUser;
-    if (user == null) {
+    final user = _client.auth.currentUser?.id ?? '';
+    if (user.isEmpty) {
       throw Exception('User belum login');
     }
-    return user.id;
+    return user;
   }
 
   // Upload Gambar (Mobile)
@@ -22,15 +22,14 @@ class SupabaseService {
     String fileName,
   ) async {
     final bytes = await file.readAsBytes();
-    await supabase.storage
+    await _client.storage
         .from(bucketName)
         .uploadBinary(
           fileName,
           bytes,
           fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
         );
-
-    return supabase.storage.from(bucketName).getPublicUrl(fileName);
+    return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
   // Upload Gambar (Web)
@@ -39,21 +38,20 @@ class SupabaseService {
     String bucketName,
     String fileName,
   ) async {
-    await supabase.storage
+    await _client.storage
         .from(bucketName)
         .uploadBinary(
           fileName,
           bytes,
           fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
         );
-
-    return supabase.storage.from(bucketName).getPublicUrl(fileName);
+    return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
   // Ambil semua obat milik user
   Future<List<Map<String, dynamic>>> getObat() async {
     final userId = currentUserId;
-    final data = await supabase
+    final data = await _client
         .from('obat')
         .select()
         .eq('user_id', userId)
@@ -70,7 +68,7 @@ class SupabaseService {
     required String deskripsi,
   }) async {
     final userId = currentUserId;
-    await supabase.from('obat').insert({
+    await _client.from('obat').insert({
       'user_id': userId,
       'nama': nama,
       'harga': harga,
@@ -81,7 +79,7 @@ class SupabaseService {
     });
   }
 
-  // Update obat (dengan ID String UUID)
+  // Update obat
   Future<void> updateObat({
     required String id,
     required String nama,
@@ -101,27 +99,19 @@ class SupabaseService {
       'deskripsi': deskripsi,
       'updated_at': DateTime.now().toIso8601String(),
     };
-    await supabase.from('obat').upsert(updates);
+    await _client.from('obat').upsert(updates);
   }
 
-  // Hapus obat (ID UUID bertipe String)
+  // Hapus obat
   Future<void> deleteObat(String id) async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
-    if (userId == null) throw Exception("User belum login");
-
-    final response = await Supabase.instance.client
-        .from('obat')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
-
-    print('Response delete: $response');
+    final userId = currentUserId;
+    await _client.from('obat').delete().eq('id', id).eq('user_id', userId);
   }
 
   // Profil pengguna
   Future<Map<String, dynamic>?> getProfile() async {
     final userId = currentUserId;
-    return await supabase.from('user').select().eq('id', userId).single();
+    return await _client.from('user').select().eq('id', userId).single();
   }
 
   Future<void> updateProfile({
@@ -135,21 +125,20 @@ class SupabaseService {
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       'updated_at': DateTime.now().toIso8601String(),
     };
-    await supabase.from('user').upsert(updates);
+    await _client.from('user').upsert(updates);
   }
 
   Future<String> uploadAvatar(File file, String bucket, String filename) async {
     final bytes = await file.readAsBytes();
     try {
-      await supabase.storage
+      await _client.storage
           .from(bucket)
           .uploadBinary(
             filename,
             bytes,
             fileOptions: const FileOptions(upsert: true),
           );
-
-      return supabase.storage.from(bucket).getPublicUrl(filename);
+      return _client.storage.from(bucket).getPublicUrl(filename);
     } catch (e) {
       throw 'Gagal mengunggah avatar: $e';
     }
@@ -157,6 +146,85 @@ class SupabaseService {
 
   // Upsert umum
   Future<void> upsertObat(Map<String, dynamic> data) async {
-    await Supabase.instance.client.from('obat').upsert(data);
+    await _client.from('obat').upsert(data);
+  }
+
+  Future<void> insertTransaksi({
+    required DateTime tanggal,
+    required int total,
+    required int bayar,
+    required int kembali,
+    required List<Map<String, dynamic>> keranjang,
+  }) async {
+    final userId = currentUserId;
+
+    try {
+      // 1. Insert ke tabel transaksi
+      final transaksi = await _client
+          .from('transaksi')
+          .insert({
+            'user_id': userId,
+            'tanggal': tanggal.toIso8601String(),
+            'total': total,
+            'pembayaran': bayar,
+            'kembalian': kembali,
+          })
+          .select()
+          .single();
+
+      final transaksiId = transaksi['id'];
+
+      // 2. Insert ke transaksi_detail
+      for (var item in keranjang) {
+        await _client.from('transaksi_detail').insert({
+          'transaksi_id': transaksiId,
+          'obat_id': item['obat_id'],
+          'jumlah_beli': item['jumlah'],
+          'harga_satuan': item['harga'],
+          'subtotal': item['subtotal'],
+        });
+      }
+    } catch (e) {
+      print("Gagal menyimpan transaksi: $e");
+      rethrow; // Biar error tetap dilempar ke atas untuk ditangani di UI
+    }
+  }
+
+  // Ambil semua transaksi user
+  Future<List<Map<String, dynamic>>> getAllTransaksi() async {
+    final userId = currentUserId;
+    final data = await _client
+        .from('transaksi')
+        .select()
+        .eq('user_id', userId)
+        .order('tanggal', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  // Ambil transaksi berdasarkan range tanggal
+  Future<List<Map<String, dynamic>>> getTransaksiBetween(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final userId = currentUserId;
+    final data = await _client
+        .from('transaksi')
+        .select()
+        .gte('tanggal', start.toIso8601String())
+        .lt('tanggal', end.toIso8601String())
+        .eq('user_id', userId)
+        .order('tanggal');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  // Ambil detail transaksi
+  Future<List<Map<String, dynamic>>> getDetailTransaksi(
+    String transaksiId,
+  ) async {
+    final data = await _client
+        .from('transaksi_detail')
+        .select()
+        .eq('transaksi_id', transaksiId);
+    return List<Map<String, dynamic>>.from(data);
   }
 }

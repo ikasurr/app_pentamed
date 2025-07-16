@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../service/supabase_service.dart';
 
 class ObatListScreen extends StatefulWidget {
@@ -12,7 +13,9 @@ class ObatListScreen extends StatefulWidget {
 class _ObatListScreenState extends State<ObatListScreen> {
   final SupabaseService _supabaseService = SupabaseService();
   List<dynamic> _obatList = [];
+  List<dynamic> _semuaObat = []; // <- Untuk menyimpan data lengkap
   bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -21,11 +24,14 @@ class _ObatListScreenState extends State<ObatListScreen> {
   }
 
   Future<void> _fetchObat() async {
-    print("🔥 Memanggil ulang _fetchObat()");
+    print("Memanggil ulang _fetchObat()");
     setState(() => _isLoading = true);
     try {
       final data = await _supabaseService.getObat();
-      setState(() => _obatList = data);
+      setState(() {
+        _semuaObat = data;
+        _obatList = data;
+      });
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -38,13 +44,26 @@ class _ObatListScreenState extends State<ObatListScreen> {
     }
   }
 
+  void _filterObat(String keyword) {
+    final hasil = _semuaObat.where((item) {
+      final nama = (item['nama'] ?? '').toString().toLowerCase();
+      return nama.contains(keyword.toLowerCase());
+    }).toList();
+
+    setState(() {
+      _obatList = hasil;
+    });
+  }
+
+  String formatRupiah(dynamic value) {
+    final number = int.tryParse(value.toString()) ?? 0;
+    return NumberFormat("#,##0", "id_ID").format(number);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        // Optional: lakukan apa pun sebelum keluar
-        return true;
-      },
+      onWillPop: () async => true,
       child: Scaffold(
         backgroundColor: const Color(0xFFE0F7F1),
         body: SafeArea(
@@ -52,7 +71,6 @@ class _ObatListScreenState extends State<ObatListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(
               children: [
-                // Search bar
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
@@ -66,8 +84,10 @@ class _ObatListScreenState extends State<ObatListScreen> {
                       ),
                     ],
                   ),
-                  child: const TextField(
-                    decoration: InputDecoration(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _filterObat,
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.search),
                       hintText: 'Cari',
                       border: InputBorder.none,
@@ -77,7 +97,6 @@ class _ObatListScreenState extends State<ObatListScreen> {
 
                 const SizedBox(height: 12),
 
-                // Tombol tambah
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
@@ -95,41 +114,84 @@ class _ObatListScreenState extends State<ObatListScreen> {
                     ),
                     child: const Text(
                       'Tambah Obat',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                // Grid Obat
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : _obatList.isEmpty
-                      ? const Center(child: Text('Belum ada data obat'))
+                      ? const Center(child: Text('Tidak ditemukan obat'))
                       : GridView.builder(
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                childAspectRatio: 0.8,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                                childAspectRatio:
+                                    1.3, // <- Ukuran card lebih kecil
                               ),
                           itemCount: _obatList.length,
                           itemBuilder: (context, index) {
                             final item = _obatList[index];
                             return GestureDetector(
                               onTap: () async {
-                                final result = await Get.toNamed(
-                                  '/obatdetail',
-                                  arguments: item,
+                                final confirm = await Get.dialog(
+                                  AlertDialog(
+                                    title: const Text("Konfirmasi"),
+                                    content: const Text(
+                                      "Yakin ingin menghapus obat ini?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Get.back(result: false),
+                                        child: const Text("Batal"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Get.back(result: true),
+                                        child: const Text("Hapus"),
+                                      ),
+                                    ],
+                                  ),
                                 );
-                                if (result == true) {
-                                  _fetchObat(); // Refresh data jika ada perubahan
+
+                                if (confirm == true) {
+                                  try {
+                                    await _supabaseService.deleteObat(
+                                      item['id'],
+                                    );
+                                    _fetchObat();
+                                    Get.snackbar(
+                                      'Berhasil',
+                                      'Obat berhasil dihapus',
+                                      snackPosition: SnackPosition.TOP,
+                                      backgroundColor: Colors.black.withOpacity(
+                                        0.5,
+                                      ), // transparan
+                                      colorText: Colors.white,
+                                      margin: const EdgeInsets.all(16),
+                                      borderRadius: 12,
+                                      duration: const Duration(seconds: 2),
+                                      isDismissible: true,
+                                    );
+                                  } catch (e) {
+                                    Get.snackbar(
+                                      'Gagal',
+                                      'Gagal menghapus obat: $e',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                  }
                                 }
                               },
-
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -142,7 +204,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                     ),
                                   ],
                                 ),
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -154,8 +216,8 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                             ),
                                             child: Image.network(
                                               item['img'],
-                                              height: 80,
-                                              width: 80,
+                                              height: 85,
+                                              width: 85,
                                               fit: BoxFit.cover,
                                             ),
                                           )
@@ -164,19 +226,23 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                             size: 60,
                                             color: Colors.grey,
                                           ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 10),
                                     Text(
                                       item['nama'] ?? '-',
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
+                                        fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "Rp${item['harga']}",
-                                      style: const TextStyle(fontSize: 13),
+                                      "Rp${formatRupiah(item['harga'])}",
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ],
                                 ),

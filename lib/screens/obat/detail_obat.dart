@@ -122,44 +122,85 @@ class DetailObat extends StatelessWidget {
                 ],
               ),
             ),
+            // Tambahkan ini setelah deskripsi dan sebelum SizedBox
             const SizedBox(height: 24),
 
-            // Tombol Edit & Hapus
+            // Tombol Edit & Hapus (di tengah, besar, rapi)
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: () async {
                     final result = await Get.toNamed(
                       '/obatform',
                       arguments: obat,
                     );
                     if (result == true) {
-                      Get.back(); // Kembali & refresh
+                      Get.back(result: true); // kembali & refresh
                     }
                   },
+                  icon: const Icon(Icons.edit),
+                  label: const Text("Edit"),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[100],
                     foregroundColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    elevation: 4,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Edit'),
                 ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: _showDeleteConfirmation,
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Get.defaultDialog(
+                      title: "Hapus Obat",
+                      middleText: "Yakin ingin menghapus obat ini?",
+                      textConfirm: "Hapus",
+                      textCancel: "Batal",
+                      confirmTextColor: Colors.white,
+                      onConfirm: () async {
+                        Get.back(); // tutup dialog dulu
+
+                        try {
+                          await _supabaseService.deleteObat(obat['id']);
+
+                          Get.snackbar(
+                            "Sukses",
+                            "Obat berhasil dihapus",
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+
+                          Get.back(
+                            result: true,
+                          ); // kembali ke list & trigger refresh
+                        } catch (e) {
+                          Get.snackbar(
+                            "Error",
+                            "Gagal menghapus obat: $e",
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        }
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text("Hapus"),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[100],
                     foregroundColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    elevation: 4,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Hapus'),
                 ),
               ],
             ),

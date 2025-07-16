@@ -4,7 +4,6 @@ import '../../screens/auth/register_screen.dart';
 import '../../screens/obat/obat_form.dart';
 import '../halaman_awal.dart';
 import 'package:app_pentamed/screens/splash_screen.dart';
-import 'package:app_pentamed/screens/obat/detail_obat.dart';
 import 'package:app_pentamed/screens/obat/obat_screen.dart';
 
 class AppRoutes {
@@ -29,7 +28,6 @@ class AppRoutes {
       page: () => const FormObatScreen(),
       transition: Transition.rightToLeft,
     ),
-    GetPage(name: '/obatdetail', page: () => const DetailObat()),
     GetPage(name: '/obatlist', page: () => const ObatListScreen()),
   ];
 }

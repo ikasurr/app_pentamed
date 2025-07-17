@@ -23,15 +23,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _redirect() async {
-    // Tunggu sedikit untuk menampilkan splash screen
     await Future.delayed(const Duration(seconds: 1));
 
-    // `mounted` check
-    if (!mounted) return;
-
     final session = supabase.auth.currentSession;
+    print('SESSION: $session');
     if (session != null) {
-      Get.offAllNamed(AppRoutes.register);
+      Get.offAllNamed(AppRoutes.home);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

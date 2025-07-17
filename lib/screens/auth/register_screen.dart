@@ -44,16 +44,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'id': res.user!.id,
             'username': _usernameController.text.trim(),
           });
-        }
 
-        if (mounted) {
-          Get.snackbar(
-            'Sukses',
-            'Pendaftaran berhasil! Silakan cek email Anda untuk konfirmasi.',
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
-          Get.back(); // Kembali ke halaman login
+          // Auto logout supaya bisa login manual
+          await supabase.auth.signOut();
+
+          // Clear text fields
+          _emailController.clear();
+          _passwordController.clear();
+          _usernameController.clear();
+
+          if (mounted) {
+            // Notifikasi transparan
+            Get.snackbar(
+              'Berhasil',
+              'Pendaftaran berhasil! Silakan login.',
+              backgroundColor: Colors.black.withOpacity(0.6),
+              colorText: Colors.white,
+              margin: const EdgeInsets.all(16),
+              snackPosition: SnackPosition.TOP,
+              borderRadius: 12,
+              isDismissible: true,
+              duration: const Duration(seconds: 3),
+            );
+
+            // Kembali ke halaman login
+            Future.delayed(const Duration(milliseconds: 600), () {
+              Get.back();
+            });
+          }
         }
       } on AuthException catch (e) {
         Get.snackbar(

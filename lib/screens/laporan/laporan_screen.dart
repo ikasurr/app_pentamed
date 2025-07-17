@@ -74,12 +74,16 @@ class _LaporanScreenState extends State<LaporanScreen> {
   Future<void> cetakPDF() async {
     final pdf = pw.Document();
 
+    final font = await PdfGoogleFonts.poppinsRegular();
+    final fontBold = await PdfGoogleFonts.poppinsBold();
+
     pdf.addPage(
       pw.Page(
         pageTheme: pw.PageTheme(
           margin: const pw.EdgeInsets.all(24),
           pageFormat: PdfPageFormat.a4,
           buildBackground: (context) => pw.Container(color: PdfColors.white),
+          theme: pw.ThemeData.withFont(base: font, bold: fontBold),
         ),
         build: (pw.Context context) {
           return pw.Column(
@@ -95,6 +99,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
               pw.SizedBox(height: 10),
               pw.Text(
                 'Periode: ${DateFormat('dd MMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMM yyyy').format(tanggalAkhir!)}',
+                style: const pw.TextStyle(fontSize: 12),
               ),
               pw.SizedBox(height: 20),
 
@@ -109,7 +114,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   2: const pw.FlexColumnWidth(2),
                 },
                 children: [
-                  // Header
                   pw.TableRow(
                     decoration: const pw.BoxDecoration(
                       color: PdfColors.grey300,
@@ -138,8 +142,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                       ),
                     ],
                   ),
-
-                  // Data rows
                   ...laporanData.map((item) {
                     final tanggal = DateFormat(
                       'dd-MM-yyyy',
@@ -173,6 +175,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
               ),
 
               pw.SizedBox(height: 16),
+              pw.Divider(),
               pw.Align(
                 alignment: pw.Alignment.centerRight,
                 child: pw.Text(
@@ -190,8 +193,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
     );
 
     final pdfBytes = await pdf.save();
-
-    // Langsung download file PDF
     await Printing.sharePdf(bytes: pdfBytes, filename: 'laporan_transaksi.pdf');
   }
 

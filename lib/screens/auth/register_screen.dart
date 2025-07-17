@@ -19,6 +19,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool statusPassword = true;
+
+  menampilkanPassword() {
+    setState(() {
+      statusPassword = !statusPassword;
+    });
+  }
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -157,8 +164,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         CustomInputField(
                           controller: _passwordController,
                           labelText: 'Password',
-                          obscureText: true,
-                          suffixIcon: const Icon(Icons.visibility_outlined),
+                          obscureText: statusPassword,
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              menampilkanPassword();
+                            },
+                            icon: statusPassword
+                                ? Icon(Icons.visibility_off)
+                                : Icon(Icons.visibility),
+                          ),
                           validator: (value) {
                             if (value == null || value.length < 6) {
                               return 'Password minimal 6 karakter';

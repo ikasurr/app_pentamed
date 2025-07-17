@@ -133,7 +133,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                 mainAxisSpacing: 12,
                                 crossAxisSpacing: 12,
                                 childAspectRatio:
-                                    1.3, // <- Ukuran card lebih kecil
+                                    0.9, // <- Ukuran card lebih kecil
                               ),
                           itemCount: _obatList.length,
                           itemBuilder: (context, index) {

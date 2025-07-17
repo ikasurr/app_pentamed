@@ -37,7 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
       final userId = user.id;
 
       // Obat
-      final obatRes = await supabase.from('obat').select('id');
+      // Obat
+      final obatRes = await supabase
+          .from('obat')
+          .select('id')
+          .eq('user_id', userId); // Filter data obat sesuai user
+
       totalObat = obatRes.length;
 
       // Hari ini

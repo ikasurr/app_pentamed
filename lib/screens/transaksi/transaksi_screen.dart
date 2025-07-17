@@ -321,7 +321,7 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
-                        onPressed: _simpanTransaksi,
+                        onPressed: _keranjang.isEmpty ? null : _simpanTransaksi,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           elevation: 4,

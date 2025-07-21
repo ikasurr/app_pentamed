@@ -13,7 +13,7 @@ class ObatListScreen extends StatefulWidget {
 class _ObatListScreenState extends State<ObatListScreen> {
   final SupabaseService _supabaseService = SupabaseService();
   List<dynamic> _obatList = [];
-  List<dynamic> _semuaObat = []; // <- Untuk menyimpan data lengkap
+  List<dynamic> _semuaObat = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
@@ -24,7 +24,6 @@ class _ObatListScreenState extends State<ObatListScreen> {
   }
 
   Future<void> _fetchObat() async {
-    print("Memanggil ulang _fetchObat()");
     setState(() => _isLoading = true);
     try {
       final data = await _supabaseService.getObat();
@@ -94,9 +93,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
@@ -118,9 +115,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -132,62 +127,98 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                 crossAxisCount: 2,
                                 mainAxisSpacing: 12,
                                 crossAxisSpacing: 12,
-                                childAspectRatio:
-                                    0.9, // <- Ukuran card lebih kecil
+                                childAspectRatio: 0.9,
                               ),
                           itemCount: _obatList.length,
                           itemBuilder: (context, index) {
                             final item = _obatList[index];
                             return GestureDetector(
                               onTap: () async {
-                                final confirm = await Get.dialog(
-                                  AlertDialog(
-                                    title: const Text("Konfirmasi"),
-                                    content: const Text(
-                                      "Yakin ingin menghapus obat ini?",
+                                final action = await Get.bottomSheet(
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Get.back(result: false),
-                                        child: const Text("Batal"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Get.back(result: true),
-                                        child: const Text("Hapus"),
-                                      ),
-                                    ],
+                                    child: Wrap(
+                                      children: [
+                                        ListTile(
+                                          leading: const Icon(Icons.edit),
+                                          title: const Text('Edit'),
+                                          onTap: () async {
+                                            Get.back();
+                                            final result = await Get.toNamed(
+                                              '/obatform',
+                                              arguments: item,
+                                            );
+                                            if (result == true) _fetchObat();
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: const Icon(Icons.delete),
+                                          title: const Text('Hapus'),
+                                          onTap: () async {
+                                            Get.back();
+                                            final confirm = await Get.dialog(
+                                              AlertDialog(
+                                                title: const Text("Konfirmasi"),
+                                                content: const Text(
+                                                  "Yakin ingin menghapus obat ini?",
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Get.back(result: false),
+                                                    child: const Text("Batal"),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Get.back(result: true),
+                                                    child: const Text("Hapus"),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                            if (confirm == true) {
+                                              try {
+                                                await _supabaseService
+                                                    .deleteObat(item['id']);
+                                                _fetchObat();
+                                                Get.snackbar(
+                                                  'Berhasil',
+                                                  'Obat berhasil dihapus',
+                                                  snackPosition:
+                                                      SnackPosition.TOP,
+                                                  backgroundColor: Colors.black
+                                                      .withOpacity(0.5),
+                                                  colorText: Colors.white,
+                                                  margin: const EdgeInsets.all(
+                                                    16,
+                                                  ),
+                                                  borderRadius: 12,
+                                                  duration: const Duration(
+                                                    seconds: 2,
+                                                  ),
+                                                  isDismissible: true,
+                                                );
+                                              } catch (e) {
+                                                Get.snackbar(
+                                                  'Gagal',
+                                                  'Gagal menghapus obat: $e',
+                                                  backgroundColor: Colors.red,
+                                                  colorText: Colors.white,
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
-
-                                if (confirm == true) {
-                                  try {
-                                    await _supabaseService.deleteObat(
-                                      item['id'],
-                                    );
-                                    _fetchObat();
-                                    Get.snackbar(
-                                      'Berhasil',
-                                      'Obat berhasil dihapus',
-                                      snackPosition: SnackPosition.TOP,
-                                      backgroundColor: Colors.black.withOpacity(
-                                        0.5,
-                                      ), // transparan
-                                      colorText: Colors.white,
-                                      margin: const EdgeInsets.all(16),
-                                      borderRadius: 12,
-                                      duration: const Duration(seconds: 2),
-                                      isDismissible: true,
-                                    );
-                                  } catch (e) {
-                                    Get.snackbar(
-                                      'Gagal',
-                                      'Gagal menghapus obat: $e',
-                                      backgroundColor: Colors.red,
-                                      colorText: Colors.white,
-                                    );
-                                  }
-                                }
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -238,6 +269,14 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                       style: const TextStyle(
                                         fontFamily: 'Poppins',
                                         fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Stok: ${item['stok'] ?? 0}",
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
                                       ),
                                     ),
                                   ],

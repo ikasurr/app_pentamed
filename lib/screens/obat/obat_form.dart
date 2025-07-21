@@ -18,6 +18,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
 
   final _namaController = TextEditingController();
   final _hargaController = TextEditingController();
+  final _stokController = TextEditingController(); // ✅ Tambah controller stok
 
   XFile? _image;
   String? oldImageUrl;
@@ -31,6 +32,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
     if (obat != null) {
       _namaController.text = obat!.nama;
       _hargaController.text = obat!.harga.toString();
+      _stokController.text = obat!.stok?.toString() ?? '0'; // ✅ isi stok
       oldImageUrl = obat!.img;
     }
   }
@@ -66,6 +68,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
       final data = {
         'nama': _namaController.text,
         'harga': int.parse(_hargaController.text),
+        'stok': int.tryParse(_stokController.text) ?? 0, // ✅ simpan stok
         'img': imageUrl,
         'user_id': userId,
       };
@@ -103,13 +106,14 @@ class _FormObatScreenState extends State<FormObatScreen> {
   void dispose() {
     _namaController.dispose();
     _hargaController.dispose();
+    _stokController.dispose(); // ✅ dispose stok controller
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F1), // ✅ background diubah di sini
+      backgroundColor: const Color(0xFFE0F7F1),
       appBar: AppBar(
         title: Text(obat != null ? 'Edit Obat' : 'Tambah Obat'),
         backgroundColor: const Color(0xFFE0F7F1),
@@ -159,6 +163,17 @@ class _FormObatScreenState extends State<FormObatScreen> {
                       ),
                       validator: (value) =>
                           value!.isEmpty ? 'Harga tidak boleh kosong' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _stokController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Stok',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) =>
+                          value!.isEmpty ? 'Stok tidak boleh kosong' : null,
                     ),
                     const SizedBox(height: 24),
                     SizedBox(

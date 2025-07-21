@@ -3,10 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../main.dart'; // Untuk akses supabase client jika diperlukan
 
+// ... import tetap sama
+
 class SupabaseService {
   final _client = Supabase.instance.client;
 
-  // Getter user ID
   String get currentUserId {
     final user = _client.auth.currentUser?.id ?? '';
     if (user.isEmpty) {
@@ -15,7 +16,6 @@ class SupabaseService {
     return user;
   }
 
-  // Upload Gambar (Mobile)
   Future<String> uploadImage(
     File file,
     String bucketName,
@@ -32,7 +32,6 @@ class SupabaseService {
     return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
-  // Upload Gambar (Web)
   Future<String> uploadImageBytes(
     Uint8List bytes,
     String bucketName,
@@ -48,7 +47,6 @@ class SupabaseService {
     return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
-  // Ambil semua obat milik user
   Future<List<Map<String, dynamic>>> getObat() async {
     final userId = currentUserId;
     final data = await _client
@@ -59,7 +57,6 @@ class SupabaseService {
     return data;
   }
 
-  // Tambah obat baru
   Future<void> addObat({
     required String nama,
     required String harga,
@@ -79,7 +76,6 @@ class SupabaseService {
     });
   }
 
-  // Update obat
   Future<void> updateObat({
     required String id,
     required String nama,
@@ -102,13 +98,11 @@ class SupabaseService {
     await _client.from('obat').upsert(updates);
   }
 
-  // Hapus obat
   Future<void> deleteObat(String id) async {
     final userId = currentUserId;
     await _client.from('obat').delete().eq('id', id).eq('user_id', userId);
   }
 
-  // Profil pengguna
   Future<Map<String, dynamic>?> getProfile() async {
     final userId = currentUserId;
     return await _client.from('user').select().eq('id', userId).single();
@@ -144,7 +138,6 @@ class SupabaseService {
     }
   }
 
-  // Upsert umum
   Future<void> upsertObat(Map<String, dynamic> data) async {
     await _client.from('obat').upsert(data);
   }
@@ -156,41 +149,33 @@ class SupabaseService {
     required int kembali,
     required List<Map<String, dynamic>> keranjang,
   }) async {
-    final userId = currentUserId;
+    final response = await _client
+        .from('transaksi')
+        .insert({
+          'user_id': currentUserId,
+          'tanggal': tanggal.toIso8601String(),
+          'total': total,
+          'bayar': bayar,
+          'kembali': kembali,
+        })
+        .select('id')
+        .single();
 
-    try {
-      // 1. Insert ke tabel transaksi
-      final transaksi = await _client
-          .from('transaksi')
-          .insert({
-            'user_id': userId,
-            'tanggal': tanggal.toIso8601String(),
-            'total': total,
-            'pembayaran': bayar,
-            'kembalian': kembali,
-          })
-          .select()
-          .single();
+    final transaksiId = response['id'];
 
-      final transaksiId = transaksi['id'];
+    for (var item in keranjang) {
+      await _client.from('transaksi_detail').insert({
+        'transaksi_id': transaksiId,
+        'obat_id': item['obat_id'],
+        'jumlah_beli': item['jumlah'],
+        'harga_satuan': item['harga'],
+        'subtotal': item['subtotal'],
+      });
 
-      // 2. Insert ke transaksi_detail
-      for (var item in keranjang) {
-        await _client.from('transaksi_detail').insert({
-          'transaksi_id': transaksiId,
-          'obat_id': item['obat_id'],
-          'jumlah_beli': item['jumlah'],
-          'harga_satuan': item['harga'],
-          'subtotal': item['subtotal'],
-        });
-      }
-    } catch (e) {
-      print("Gagal menyimpan transaksi: $e");
-      rethrow; // Biar error tetap dilempar ke atas untuk ditangani di UI
+      await kurangiStokObat(item['obat_id'], item['jumlah']);
     }
   }
 
-  // Ambil semua transaksi user
   Future<List<Map<String, dynamic>>> getAllTransaksi() async {
     final userId = currentUserId;
     final data = await _client
@@ -201,7 +186,6 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  // Ambil transaksi berdasarkan range tanggal
   Future<List<Map<String, dynamic>>> getTransaksiBetween(
     DateTime start,
     DateTime end,
@@ -217,7 +201,6 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  // Ambil detail transaksi
   Future<List<Map<String, dynamic>>> getDetailTransaksi(
     String transaksiId,
   ) async {
@@ -226,5 +209,22 @@ class SupabaseService {
         .select()
         .eq('transaksi_id', transaksiId);
     return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> kurangiStokObat(int obatId, int jumlahBeli) async {
+    final response = await _client
+        .from('obat')
+        .select('stok')
+        .eq('id', obatId)
+        .single();
+
+    final stokSekarang = response['stok'] ?? 0;
+    final stokBaru = stokSekarang - jumlahBeli;
+
+    if (stokBaru < 0) {
+      throw Exception("Stok tidak mencukupi");
+    }
+
+    await _client.from('obat').update({'stok': stokBaru}).eq('id', obatId);
   }
 }

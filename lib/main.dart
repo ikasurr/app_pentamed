@@ -29,16 +29,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Pentamed',
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        primarySwatch: Colors.teal,
-        useMaterial3: true,
+    return ScrollConfiguration(
+      behavior:
+          const NoGlowScrollBehavior(), // Hapus efek scroll glow di seluruh app
+      child: GetMaterialApp(
+        title: 'Pentamed',
+        theme: ThemeData(
+          textTheme: GoogleFonts.poppinsTextTheme(),
+          primarySwatch: Colors.teal,
+          useMaterial3: true,
+        ),
+        initialRoute: AppRoutes.splash,
+        getPages: AppRoutes.routes,
+        debugShowCheckedModeBanner: false,
       ),
-      initialRoute: AppRoutes.splash,
-      getPages: AppRoutes.routes,
-      debugShowCheckedModeBanner: false,
     );
+  }
+}
+
+// ScrollBehavior custom untuk menghilangkan efek glow biru
+class NoGlowScrollBehavior extends ScrollBehavior {
+  const NoGlowScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }

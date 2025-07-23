@@ -6,7 +6,6 @@ class Obat {
   final String nama;
   final int harga;
   final String? img;
-  final int? stok;
   final DateTime createdAt;
 
   Obat({
@@ -15,7 +14,6 @@ class Obat {
     required this.nama,
     required this.harga,
     this.img,
-    this.stok,
     required this.createdAt,
   });
 
@@ -26,7 +24,6 @@ class Obat {
       nama: json['nama'],
       harga: json['harga'],
       img: json['img'],
-      stok: json['stok'],
       createdAt: DateTime.parse(json['created_at']),
     );
   }
@@ -37,7 +34,6 @@ class Obat {
       'user_id': userId,
       'harga': harga,
       'image_url': img,
-      'stok': stok,
       'created_at': createdAt.toIso8601String(),
     };
   }

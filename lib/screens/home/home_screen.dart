@@ -36,16 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final userId = user.id;
 
-      // Obat
-      // Obat
       final obatRes = await supabase
           .from('obat')
           .select('id')
-          .eq('user_id', userId); // Filter data obat sesuai user
+          .eq('user_id', userId);
 
       totalObat = obatRes.length;
 
-      // Hari ini
       final now = DateTime.now();
       final mulai = DateTime(now.year, now.month, now.day).toIso8601String();
       final akhir = now.toIso8601String();
@@ -75,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1), // semi-transparan
+          color: Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
           boxShadow: const [
             BoxShadow(

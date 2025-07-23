@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _redirect() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
 
     final session = supabase.auth.currentSession;
     print('SESSION: $session');
@@ -36,14 +36,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: const Color(0xFFE0F7F1),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text('Memuat...'),
+            Image.asset('assets/logo_app.png', width: 120, height: 120),
+            const SizedBox(height: 10),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 10),
+            const Text('Memuat...'),
           ],
         ),
       ),

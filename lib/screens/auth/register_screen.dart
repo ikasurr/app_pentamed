@@ -1,5 +1,3 @@
-// lib/screens/auth/register_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,16 +43,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'username': _usernameController.text.trim(),
           });
 
-          // Auto logout supaya bisa login manual
           await supabase.auth.signOut();
 
-          // Clear text fields
           _emailController.clear();
           _passwordController.clear();
           _usernameController.clear();
 
           if (mounted) {
-            // Notifikasi transparan
             Get.snackbar(
               'Berhasil',
               'Pendaftaran berhasil! Silakan login.',
@@ -67,9 +62,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               duration: const Duration(seconds: 3),
             );
 
-            // Kembali ke halaman login
-            Future.delayed(const Duration(milliseconds: 600), () {
-              Get.back();
+            Future.delayed(const Duration(seconds: 1), () {
+              Get.offAllNamed('/login');
             });
           }
         }
@@ -108,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F1), // mint green soft
+      backgroundColor: const Color(0xFFE0F7F1),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -118,7 +112,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const SizedBox(height: 24),
 
-                // Card form
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -141,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Column(
                       children: [
                         const Text(
-                          'Sign up',
+                          'Daftar',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -149,7 +142,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Username
                         CustomInputField(
                           controller: _usernameController,
                           labelText: 'Username',
@@ -163,7 +155,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Email
                         CustomInputField(
                           controller: _emailController,
                           labelText: 'Email',
@@ -178,7 +169,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Password
                         CustomInputField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -201,7 +191,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Tombol daftar
                         _isLoading
                             ? const CircularProgressIndicator()
                             : SizedBox(
@@ -217,7 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                   ),
                                   child: const Text(
-                                    'Sign up',
+                                    'Daftar',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -228,11 +217,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                         const SizedBox(height: 20),
 
-                        // Login link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Already have an account? "),
+                            const Text("Sudah punya akun? "),
                             GestureDetector(
                               onTap: () => Get.back(),
                               child: const Text(

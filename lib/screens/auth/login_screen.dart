@@ -1,5 +1,3 @@
-// lib/screens/auth/login_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -43,9 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
           throw Exception('User ID tidak ditemukan');
         }
         if (mounted) {
-          Get.offAllNamed(
-            AppRoutes.index, // Ganti dengan rute yang sesuai
-          ); // Navigasi ke halaman utama setelah login
+          Get.offAllNamed(AppRoutes.index);
         }
       } on AuthException catch (e) {
         Get.snackbar(
@@ -81,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F1), // mint green soft
+      backgroundColor: const Color(0xFFE0F7F1),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -91,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 24),
 
-                // Card Form Section
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -113,17 +108,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Icon Profile di dalam card
-                        const CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.black12,
-                          child: Icon(
-                            Icons.person,
-                            size: 40,
-                            color: Colors.black54,
-                          ),
+                        Image.asset(
+                          'assets/logo_app.png',
+                          width: 120,
+                          height: 120,
                         ),
-                        const SizedBox(height: 16),
+
+                        const SizedBox(height: 10),
 
                         const Text(
                           'Login',
@@ -134,7 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Email field
                         CustomInputField(
                           controller: _emailController,
                           labelText: 'Email',
@@ -149,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Password field
                         CustomInputField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -172,7 +161,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Login button
                         _isLoading
                             ? const CircularProgressIndicator()
                             : SizedBox(
@@ -199,7 +187,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                         const SizedBox(height: 20),
 
-                        // Sign up link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

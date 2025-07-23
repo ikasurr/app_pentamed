@@ -150,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             icon: statusPassword
                                 ? Icon(Icons.visibility_off)
                                 : Icon(Icons.visibility),
+                            color: Colors.grey,
                           ),
                           validator: (value) {
                             if (value == null || value.length < 6) {

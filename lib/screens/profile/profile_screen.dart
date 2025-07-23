@@ -1,4 +1,3 @@
-// lib/screens/profile/profile_screen.dart
 import 'dart:io';
 import 'package:app_pentamed/service/supabase_service.dart';
 import 'package:flutter/foundation.dart';
@@ -175,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'Sukses',
         'Password berhasil diubah',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.black.withOpacity(0.5), // transparan
+        backgroundColor: Colors.black.withOpacity(0.6),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
@@ -210,11 +209,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F1), // <- Ganti background
-      appBar: AppBar(
-        title: const Text('Profil'),
-        backgroundColor: Color(0xFFE0F7F1),
-      ),
+      appBar: AppBar(backgroundColor: const Color(0xFFE0F7F1)),
+      backgroundColor: const Color(0xFFE0F7F1),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _profile == null

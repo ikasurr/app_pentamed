@@ -1,7 +1,5 @@
-// lib/models/Obat_model.dart
-
 class Obat {
-  final int id;
+  final String id;
   final String userId;
   final String nama;
   final int harga;
@@ -19,12 +17,15 @@ class Obat {
 
   factory Obat.fromJson(Map<String, dynamic> json) {
     return Obat(
-      id: json['id'],
-      userId: json['user_id'],
-      nama: json['nama'],
-      harga: json['harga'],
+      id: json['id'].toString(),
+      userId: json['user_id'] ?? '',
+      nama: json['nama'] ?? '',
+      harga: json['harga'] is int
+          ? json['harga']
+          : int.tryParse(json['harga'].toString()) ?? 0,
       img: json['img'],
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt:
+          DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now(),
     );
   }
 
@@ -32,8 +33,9 @@ class Obat {
     return {
       'id': id,
       'user_id': userId,
+      'nama': nama,
       'harga': harga,
-      'image_url': img,
+      'img': img,
       'created_at': createdAt.toIso8601String(),
     };
   }

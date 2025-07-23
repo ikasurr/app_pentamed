@@ -6,22 +6,25 @@ import '../../utils/app_routes.dart';
 import '../../utils/constants.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_pentamed/screens/splash_screen.dart';
+import '../../../main.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi GetStorage
   await GetStorage.init();
 
-  // Inisialisasi Supabase
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
+  );
 
   await initializeDateFormatting('id_ID', null);
 
   runApp(const MyApp());
 }
 
-// Helper global untuk akses mudah ke client Supabase
 final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
@@ -29,34 +32,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior:
-          const NoGlowScrollBehavior(), // Hapus efek scroll glow di seluruh app
-      child: GetMaterialApp(
-        title: 'Pentamed',
-        theme: ThemeData(
-          textTheme: GoogleFonts.poppinsTextTheme(),
-          primarySwatch: Colors.teal,
-          useMaterial3: true,
-        ),
-        initialRoute: AppRoutes.splash,
-        getPages: AppRoutes.routes,
-        debugShowCheckedModeBanner: false,
+    return GetMaterialApp(
+      title: 'Pentamed',
+      theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        primarySwatch: Colors.teal,
+        useMaterial3: true,
       ),
+      initialRoute: AppRoutes.splash,
+      getPages: AppRoutes.routes,
+      debugShowCheckedModeBanner: false,
     );
-  }
-}
-
-// ScrollBehavior custom untuk menghilangkan efek glow biru
-class NoGlowScrollBehavior extends ScrollBehavior {
-  const NoGlowScrollBehavior();
-
-  @override
-  Widget buildOverscrollIndicator(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
-    return child;
   }
 }

@@ -27,8 +27,10 @@ class _FormObatScreenState extends State<FormObatScreen> {
   @override
   void initState() {
     super.initState();
-    obat = Get.arguments;
-    if (obat != null) {
+
+    final args = Get.arguments;
+    if (args != null && args is Map<String, dynamic>) {
+      obat = Obat.fromJson(args);
       _namaController.text = obat!.nama;
       _hargaController.text = obat!.harga.toString();
       oldImageUrl = obat!.img;
@@ -48,11 +50,23 @@ class _FormObatScreenState extends State<FormObatScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final harga = int.tryParse(_hargaController.text);
+    if (harga == null || harga <= 0) {
+      Get.snackbar(
+        'Invalid',
+        'Harga harus lebih dari 0',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final userId = _supabaseService.currentUserId;
       String? imageUrl = oldImageUrl;
 
+      // Upload image jika ada gambar baru dipilih
       if (_image != null) {
         final fileName = 'obat_${DateTime.now().millisecondsSinceEpoch}.png';
         final bytes = await _image!.readAsBytes();
@@ -65,22 +79,24 @@ class _FormObatScreenState extends State<FormObatScreen> {
 
       final data = {
         'nama': _namaController.text,
-        'harga': int.parse(_hargaController.text),
+        'harga': harga,
         'img': imageUrl,
         'user_id': userId,
       };
 
+      // Tambahkan ID jika edit
       if (obat != null) {
         data['id'] = obat!.id;
       }
 
+      // Insert / update
       await _supabaseService.upsertObat(data);
       Get.back(result: true);
       Get.snackbar(
         'Sukses',
         'Data obat berhasil disimpan',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.black.withOpacity(0.5),
+        backgroundColor: Colors.black.withOpacity(0.6),
         colorText: Colors.white,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
@@ -109,7 +125,7 @@ class _FormObatScreenState extends State<FormObatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F1), // ✅ background diubah di sini
+      backgroundColor: const Color(0xFFE0F7F1),
       appBar: AppBar(
         title: Text(obat != null ? 'Edit Obat' : 'Tambah Obat'),
         backgroundColor: const Color(0xFFE0F7F1),

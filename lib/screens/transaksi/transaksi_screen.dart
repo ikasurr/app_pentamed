@@ -138,7 +138,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Tanggal Transaksi
               InkWell(
                 onTap: _pilihTanggal,
                 child: Row(
@@ -154,7 +153,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Cari Obat
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -173,7 +171,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
               ),
               const SizedBox(height: 12),
 
-              // List Obat Horizontal
               SizedBox(
                 height: 120,
                 child: ListView.builder(
@@ -221,11 +218,9 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
               ),
               const SizedBox(height: 16),
 
-              // NOTA, TOTAL, PEMBAYARAN, KEMBALIAN
               Expanded(
                 child: ListView(
                   children: [
-                    // Nota Transaksi
                     Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 12),
@@ -258,7 +253,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
                       ),
                     ),
 
-                    // Total
                     Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
@@ -278,7 +272,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
                       ),
                     ),
 
-                    // Pembayaran
                     Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
@@ -297,7 +290,6 @@ class _TransaksiScreenState extends State<TransaksiScreen> {
                       ),
                     ),
 
-                    // Kembalian
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(

@@ -110,16 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: const Color(0xFFE0F7F1)),
       backgroundColor: const Color(0xFFE0F7F1),
-      appBar: AppBar(
-        title: Text(
-          'Dashboard',
-          style: GoogleFonts.poppins(color: Colors.black),
-        ),
-        backgroundColor: const Color(0xFFE0F7F1),
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Column(

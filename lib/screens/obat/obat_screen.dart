@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../service/supabase_service.dart';
 
-// ... import tetap sama
-
 class ObatListScreen extends StatefulWidget {
   const ObatListScreen({Key? key}) : super(key: key);
 
@@ -145,23 +143,29 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                   AlertDialog(
                                     title: const Text("Konfirmasi"),
                                     content: const Text(
-                                      "Yakin ingin menghapus obat ini?",
+                                      "Pilih aksi untuk obat ini",
                                     ),
+                                    actionsAlignment: MainAxisAlignment.center,
                                     actions: [
                                       TextButton(
                                         onPressed: () =>
-                                            Get.back(result: false),
-                                        child: const Text("Batal"),
+                                            Get.back(result: "edit"),
+                                        child: const Text("Edit"),
                                       ),
                                       TextButton(
-                                        onPressed: () => Get.back(result: true),
+                                        onPressed: () =>
+                                            Get.back(result: "delete"),
                                         child: const Text("Hapus"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Get.back(result: null),
+                                        child: const Text("Batal"),
                                       ),
                                     ],
                                   ),
                                 );
 
-                                if (confirm == true) {
+                                if (confirm == "delete") {
                                   try {
                                     await _supabaseService.deleteObat(
                                       item['id'],
@@ -172,7 +176,7 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                       'Obat berhasil dihapus',
                                       snackPosition: SnackPosition.TOP,
                                       backgroundColor: Colors.black.withOpacity(
-                                        0.6,
+                                        0.5,
                                       ),
                                       colorText: Colors.white,
                                       margin: const EdgeInsets.all(16),
@@ -188,6 +192,12 @@ class _ObatListScreenState extends State<ObatListScreen> {
                                       colorText: Colors.white,
                                     );
                                   }
+                                } else if (confirm == "edit") {
+                                  final result = await Get.toNamed(
+                                    '/obatform',
+                                    arguments: item,
+                                  );
+                                  if (result == true) _fetchObat();
                                 }
                               },
                               child: Container(

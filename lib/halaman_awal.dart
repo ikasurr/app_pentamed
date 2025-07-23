@@ -7,7 +7,7 @@ import 'package:app_pentamed/screens/transaksi/transaksi_screen.dart';
 import 'package:app_pentamed/screens/home/home_screen.dart';
 
 class HalamanAwal extends StatefulWidget {
-  const HalamanAwal({super.key}); // ← tidak butuh parameter pengguna
+  const HalamanAwal({super.key});
 
   @override
   State<HalamanAwal> createState() => _HalamanAwalState();
@@ -16,7 +16,6 @@ class HalamanAwal extends StatefulWidget {
 class _HalamanAwalState extends State<HalamanAwal> {
   int _currentIndex = 2;
 
-  // Ambil argument dari Get.arguments saat init
   @override
   void initState() {
     super.initState();

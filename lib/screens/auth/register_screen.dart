@@ -180,6 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             icon: statusPassword
                                 ? Icon(Icons.visibility_off)
                                 : Icon(Icons.visibility),
+                            color: Colors.grey,
                           ),
                           validator: (value) {
                             if (value == null || value.length < 6) {

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../main.dart'; // Untuk akses supabase client jika diperlukan
 
 class SupabaseService {
   final _client = Supabase.instance.client;
@@ -15,7 +14,6 @@ class SupabaseService {
     return user;
   }
 
-  // Upload Gambar (Mobile)
   Future<String> uploadImage(
     File file,
     String bucketName,
@@ -32,7 +30,6 @@ class SupabaseService {
     return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
-  // Upload Gambar (Web)
   Future<String> uploadImageBytes(
     Uint8List bytes,
     String bucketName,
@@ -48,7 +45,6 @@ class SupabaseService {
     return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
-  // Ambil semua obat milik user
   Future<List<Map<String, dynamic>>> getObat() async {
     final userId = currentUserId;
     final data = await _client
@@ -59,7 +55,6 @@ class SupabaseService {
     return data;
   }
 
-  // Tambah obat baru
   Future<void> addObat({
     required String nama,
     required String harga,
@@ -79,7 +74,6 @@ class SupabaseService {
     });
   }
 
-  // Update obat
   Future<void> updateObat({
     required String id,
     required String nama,
@@ -102,13 +96,11 @@ class SupabaseService {
     await _client.from('obat').upsert(updates);
   }
 
-  // Hapus obat
   Future<void> deleteObat(String id) async {
     final userId = currentUserId;
     await _client.from('obat').delete().eq('id', id).eq('user_id', userId);
   }
 
-  // Profil pengguna
   Future<Map<String, dynamic>?> getProfile() async {
     final userId = currentUserId;
     return await _client.from('user').select().eq('id', userId).single();
@@ -144,8 +136,12 @@ class SupabaseService {
     }
   }
 
-  // Upsert umum
   Future<void> upsertObat(Map<String, dynamic> data) async {
+    if (data.containsKey('id') &&
+        (data['id'] == null || data['id'].toString().trim().isEmpty)) {
+      data.remove('id');
+    }
+
     await _client.from('obat').upsert(data);
   }
 
@@ -159,7 +155,6 @@ class SupabaseService {
     final userId = currentUserId;
 
     try {
-      // 1. Insert ke tabel transaksi
       final transaksi = await _client
           .from('transaksi')
           .insert({
@@ -174,7 +169,6 @@ class SupabaseService {
 
       final transaksiId = transaksi['id'];
 
-      // 2. Insert ke transaksi_detail
       for (var item in keranjang) {
         await _client.from('transaksi_detail').insert({
           'transaksi_id': transaksiId,
@@ -186,11 +180,10 @@ class SupabaseService {
       }
     } catch (e) {
       print("Gagal menyimpan transaksi: $e");
-      rethrow; // Biar error tetap dilempar ke atas untuk ditangani di UI
+      rethrow;
     }
   }
 
-  // Ambil semua transaksi user
   Future<List<Map<String, dynamic>>> getAllTransaksi() async {
     final userId = currentUserId;
     final data = await _client
@@ -201,7 +194,6 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  // Ambil transaksi berdasarkan range tanggal
   Future<List<Map<String, dynamic>>> getTransaksiBetween(
     DateTime start,
     DateTime end,
@@ -217,7 +209,6 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  // Ambil detail transaksi
   Future<List<Map<String, dynamic>>> getDetailTransaksi(
     String transaksiId,
   ) async {

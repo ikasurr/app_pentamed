@@ -90,9 +90,9 @@ class _LaporanScreenState extends State<LaporanScreen> {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
-                'LAPORAN TRANSAKSI',
+                'Laporan Transaksi',
                 style: pw.TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
@@ -102,7 +102,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 style: const pw.TextStyle(fontSize: 12),
               ),
               pw.SizedBox(height: 20),
-
               pw.Table(
                 border: pw.TableBorder.all(
                   color: PdfColors.grey400,
@@ -173,7 +172,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   }).toList(),
                 ],
               ),
-
               pw.SizedBox(height: 16),
               pw.Divider(),
               pw.Align(
@@ -204,11 +202,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0F7F1),
-      appBar: AppBar(
-        title: const Text('Laporan Transaksi'),
-        backgroundColor: const Color(0xFFE0F7F1),
-        elevation: 0,
-      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
